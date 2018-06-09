@@ -29,7 +29,7 @@ npm install
 
 ### 4. 编译源代码
 ```bash
-wepy build
+wepy build --watch
 ```
 
 ### 5.导入至开发者工具
