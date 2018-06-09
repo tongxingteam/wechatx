@@ -1,0 +1,16 @@
+<style lang="less">
+
+</style>
+<template>
+    <view>
+        行程详情页
+    </view>
+</template>
+<script>
+    import wepy from 'wepy';
+
+    export default class Trip extends wepy.page {
+
+    }
+</script>
+

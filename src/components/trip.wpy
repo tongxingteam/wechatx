@@ -1,0 +1,104 @@
+<style lang="less">
+    @gray_font_333: #333;
+    @gray_font_666: #666;
+    .trip{
+        width: 100%;
+        padding: 10rpx 10rpx;
+        background-color: #fff;
+        .trip_header{
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: @gray_font_666;
+            .trip_header_user{
+                display: flex;
+                align-items: center;
+                image{
+                    width: 50rpx;
+                    height: 50rpx;
+                    border-radius: 50%;
+                    border: 1px solid #ddd;
+                    margin-right: 15rpx;
+                }
+            }
+        }
+        .trip_location, .trip_time{
+            color: @gray_font_333;
+            padding: 15rpx 0 15rpx 64rpx;
+            display: flex;
+            > text{
+                flex: 0 0 auto;
+            }
+            > view{
+                flex: 1 1 auto;
+                display: flex;
+                flex-wrap: wrap;
+            }
+            .location_item{
+                flex: 0 0 auto;
+                border: 1px solid #ddd;
+                padding: 2rpx 8rpx;
+                margin-left: 20rpx;
+                margin-bottom: 10rpx;
+            }
+        }
+        .trip_time{
+            margin-top: -15rpx;
+            .trip_time-value{
+                display: inline-block;
+                margin-left: 20rpx;
+            }   
+        }
+    }
+</style>
+<template>
+    <navigator url="/pages/trip?tripId={{tripId}}">
+        <view class="trip">
+            <view class="trip_header">
+                <navigator url="/pages/user?userId={{userId}}">
+                    <view class="trip_header_user" @tap.stop="showUserInfo">
+                        <image src="{{userImg}}" />
+                        <text>{{userName}}</text>
+                    </view> 
+                </navigator>
+                <text class="trip_create_time">{{createTime}}</text>
+            </view>
+            <view class="trip_location">
+                <text>目的地:</text>
+                <view>
+                    <repeat for="{{locationList}}">
+                        <text class="location_item">{{item}}</text>
+                    </repeat>
+                </view>
+            </view>
+            <view class="trip_time">
+                <text>时间:</text>
+                <text class="trip_time-value">{{startTime + '~' + endTime}}</text>
+            </view>
+        </view>
+    </navigator>
+</template>
+<script>
+    import wepy from 'wepy';
+
+    export default class Trip extends wepy.component {
+        props = {
+            tripId: String, //行程id
+            userId: String, //用户id
+            userImg: String, //用户头像
+            userName: String, //用户名称
+            createTime: String, //创建时间
+            location: String, //目的地
+            startTime: String, //开始时间
+            endTime: String //结束时间
+        };
+        computed = {
+            locationList () {
+                return this.location.split(',');
+            }
+        };
+        onLoad (options) {
+            console.log(options);
+        };
+    }
+</script>

@@ -1,0 +1,16 @@
+<style lang="less">
+
+</style>
+<template>
+    <view>
+        行程发布页
+    </view>
+</template>
+<script>
+    import wepy from 'wepy';
+
+    export default class Publish extends wepy.page {
+
+    }
+</script>
+

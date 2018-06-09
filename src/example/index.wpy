@@ -55,6 +55,15 @@
 </style>
 <template>
     <view class="index page">
+        <Trip 
+            userImg="https://ss1.bdstatic.com/70cFuXSh_Q1YnxGkpoWK1HF6hhy/it/u=361264274,3451054389&fm=27&gp=0.jpg"
+            userName="张三李四"
+            createTime="2018-02-03"
+            location="北京,天津,石家庄"
+            startTime="2018-04-12"
+            endTime="2018-06-23"
+            userId="uuidsdfsa23434"
+            ></Trip>
         <view class="page__hd">
             <view class="page__title">WeUI</view>
             <view class="page__desc">WeUI 是一套同微信原生视觉体验一致的基础样式库，由微信官方设计团队为微信内网页和微信小程序量身设计，令用户的使用感知更加统一。以下DEMO就 WePY 实现，并且提供 WEB 版本。</view>
@@ -87,8 +96,13 @@
 
 <script>
     import wepy from 'wepy';
+    import Trip from '../components/trip';
 
     export default class Index extends wepy.page {
+
+        components = {
+            Trip
+        };
 
         data = {
             list: [

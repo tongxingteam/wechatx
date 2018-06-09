@@ -44,6 +44,11 @@ export default class extends wepy.app {
 
     config = {
         'pages': [
+            'pages/index',
+            'pages/trip',
+            'pages/user',
+            'pages/publish',
+            
             'example/index',
             'example/button',
             'example/list',

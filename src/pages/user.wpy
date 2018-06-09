@@ -1,0 +1,18 @@
+<style lang="less">
+
+</style>
+<template>
+    <view>
+        个人主页
+    </view>
+</template>
+<script>
+    import wepy from 'wepy';
+
+    export default class User extends wepy.page {
+        onLoad (option) {
+            
+        }
+    }
+</script>
+
