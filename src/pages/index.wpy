@@ -76,6 +76,7 @@
   import wepy from 'wepy'
   import Trip from '../components/trip'
   import url from '../config/url'
+  import HttpService from '../util';
 
   export default class Index extends wepy.page {
     config = {
@@ -137,21 +138,33 @@
     }
 
     onLoad() {
-      let self = this
-      wepy.request({
-            url: url.list,
-            method: 'GET',
-            success: function(re) {
-                if (re.data.code === 20000) {
-                    console.log("abc",re);
-                    console.log("infor:", re.data.msg);
-                }
-            }
-        })
-      this.$parent.getUserInfo(function(data) {
-        self.userInfo = data
-        self.$apply()
-      })
+      // 请求测试
+      HttpService.Get({
+          urlName: 'list',
+          data: {
+              page: 1
+          },
+          success (code, data, msg) {
+              wx.showToast({
+                  title: '成功'+code,
+                  icon: 'success'
+              });
+              console.log('测试请求数据:' + data);
+          },
+          fail () {
+              wx.showToast({
+                  title: '成功',
+                  icon: 'success'
+              });
+          },
+          complete () {
+
+          }
+      });
+      this.$parent.getUserInfo((data) => {
+        this.userInfo = data
+        this.$apply()
+      });
     }
   }
 </script>
