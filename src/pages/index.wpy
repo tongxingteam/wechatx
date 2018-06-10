@@ -75,6 +75,7 @@
 <script>
   import wepy from 'wepy'
   import Trip from '../components/trip'
+  import url from '../config/url'
 
   export default class Index extends wepy.page {
     config = {
@@ -137,8 +138,16 @@
 
     onLoad() {
       let self = this
-      console.log('self', self)
-      console.log('parentData', this.$parent.globalData)
+      wepy.request({
+            url: url.list,
+            method: 'GET',
+            success: function(re) {
+                if (re.data.code === 20000) {
+                    console.log("abc",re);
+                    console.log("infor:", re.data.msg);
+                }
+            }
+        })
       this.$parent.getUserInfo(function(data) {
         self.userInfo = data
         self.$apply()
