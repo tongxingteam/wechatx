@@ -1,0 +1,20 @@
+<style lang="less">
+
+</style>
+<template>
+    <view>
+        我的
+    </view>
+</template>
+<script>
+    import wepy from 'wepy';
+
+    export default class My extends wepy.page {
+        config = {
+            navigationBarTitleText: '我的'
+        }
+        methods = {}
+        data = {}
+    }
+</script>
+

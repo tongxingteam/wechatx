@@ -1,0 +1,20 @@
+<style lang="less">
+
+</style>
+<template>
+    <view>
+        消息中心
+    </view>
+</template>
+<script>
+    import wepy from 'wepy';
+
+    export default class Message extends wepy.page {
+        config = {
+            navigationBarTitleText: '消息'
+        }
+        methods = {}
+        data = {}
+    }
+</script>
+

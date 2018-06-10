@@ -1,0 +1,20 @@
+<style lang="less">
+
+</style>
+<template>
+    <view>
+        发现
+    </view>
+</template>
+<script>
+    import wepy from 'wepy';
+
+    export default class Discovery extends wepy.page {
+        config = {
+            navigationBarTitleText: '发现'
+        }
+        methods = {}
+        data = {}
+    }
+</script>
+

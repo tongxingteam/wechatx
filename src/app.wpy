@@ -1,104 +1,113 @@
 <style lang="less">
-@import './style/weui.less';
-page{
-    background-color: #F8F8F8;
-    font-size: 16px;
-    font-family: -apple-system-font,Helvetica Neue,Helvetica,sans-serif;
-}
-.page__hd {
-    padding: 40px;
-}
-.page__bd {
-    padding-bottom: 40px;
-}
-.page__bd_spacing {
-    padding-left: 15px;
-    padding-right: 15px;
-}
-
-.page__ft{
-    padding-bottom: 10px;
-    text-align: center;
-}
-
-.page__title {
-    text-align: left;
-    font-size: 20px;
-    font-weight: 400;
-}
-
-.page__desc {
-    margin-top: 5px;
-    color: #888888;
-    text-align: left;
-    font-size: 14px;
+.container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  box-sizing: border-box;
 }
 </style>
 
 <script>
-
-import wepy from 'wepy';
-import 'wepy-async-function';
+import wepy from 'wepy'
+import 'wepy-async-function'
 
 export default class extends wepy.app {
-
-    config = {
-        'pages': [
-            'pages/index',
-            'pages/trip',
-            'pages/user',
-            'pages/publish',
-            
-            'example/index',
-            'example/button',
-            'example/list',
-            'example/input',
-            'example/slider',
-            'example/uploader',
-
-            'example/article',
-            'example/badge',
-            'example/flex',
-            'example/footer',
-            'example/gallery',
-            'example/grid',
-            'example/icons',
-            'example/loadmore',
-            'example/panel',
-            'example/preview',
-            'example/progress',
-
-            'example/actionsheet',
-            'example/dialog',
-            'example/msg',
-            'example/msg_fail',
-            'example/msg_success',
-            'example/picker',
-            'example/toast',
-
-            'example/navbar',
-            'example/tabbar',
-
-            'example/searchbar'
-        ],
-        'window': {
-            'navigationBarTextStyle': 'black',
-            'navigationBarTitleText': 'WeUI in WePY',
-            'navigationBarBackgroundColor': '#f8f8f8',
-            'backgroundColor': '#f8f8f8'
+  config = {
+    pages: [
+        'pages/index', // 首页
+        'pages/publish', // 发布
+        'pages/trip', // 行程详情
+        'pages/user', // 个人主页
+        'pages/message', // 消息
+        'pages/discovery', // 发现
+        'pages/my' // 我的
+    ],
+    window: {
+      backgroundTextStyle: 'light',
+      navigationBarBackgroundColor: '#fff',
+      navigationBarTitleText: 'WeChat',
+      navigationBarTextStyle: 'black'
+    },
+    tabBar: {
+      color: '#BBBBBB',
+      selectedColor: '#59D3E1',
+      list: [
+        {
+          pagePath: 'pages/index',
+          text: '首页',
+          iconPath: 'images/tabBar/home_x48.png',
+          selectedIconPath: 'images/tabBar/home_press_x48.png'
         },
-        'networkTimeout': {
-            'request': 10000,
-            'connectSocket': 10000,
-            'uploadFile': 10000,
-            'downloadFile': 10000
+        {
+          pagePath: 'pages/message',
+          text: '消息',
+          iconPath: 'images/tabBar/message_x64.png',
+          selectedIconPath: 'images/tabBar/message_press_x64.png'
+        },
+        {
+          pagePath: 'pages/discovery',
+          text: '发现',
+          iconPath: 'images/tabBar/discovery_x48.png',
+          selectedIconPath: 'images/tabBar/discovery_press_x48.png'
+        },
+        {
+          pagePath: 'pages/my',
+          text: '我的',
+          iconPath: 'images/tabBar/my_x48.png',
+          selectedIconPath: 'images/tabBar/my_press_x48.png'
         }
-    };
-
-    constructor () {
-        super();
-        this.use('promisify');
-        this.use('requestfix');
+      ]
     }
+  }
+
+  globalData = {
+    userInfo: null
+  }
+
+  constructor() {
+    super()
+    this.use('requestfix')
+  }
+
+  onLaunch() {
+    //this.testAsync()
+  }
+
+  sleep(s) {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        resolve('promise resolved')
+      }, s * 1000)
+    })
+  }
+
+  async testAsync() {
+    const data = await this.sleep(3)
+    console.log(data)
+  }
+
+  getUserInfo(cb) {
+    const that = this
+    if (this.globalData.userInfo) {
+      return this.globalData.userInfo
+    }
+    console.log('88')
+    wepy.getSetting({
+      success: function(res) {
+        if (res.authSetting['scope.userInfo']) {
+          wepy.getUserInfo({
+            success: function(res) {
+              console.log(res.userInfo, '用户已经授权过')
+              that.globalData.userInfo = res.userInfo
+              console.log('globalData', that.globalData)
+              cb && cb(res.userInfo)
+            }
+          })
+        }
+      }
+    })
+  }
 }
 </script>

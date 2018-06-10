@@ -1,15 +1,20 @@
-<style lang="less">
+<style lang="less" scoped>
     @gray_font_333: #333;
     @gray_font_666: #666;
     .trip{
         width: 100%;
         padding: 10rpx 10rpx;
         background-color: #fff;
+        margin-bottom: 5rpx;
         .trip_header{
             display: flex;
             justify-content: space-between;
             align-items: center;
             color: @gray_font_666;
+            font-size: 32rpx;
+            > text{
+                font-size: 30rpx;
+            }
             .trip_header_user{
                 display: flex;
                 align-items: center;
@@ -26,6 +31,7 @@
             color: @gray_font_333;
             padding: 15rpx 0 15rpx 64rpx;
             display: flex;
+            font-size: 34rpx;
             > text{
                 flex: 0 0 auto;
             }
@@ -55,8 +61,8 @@
     <navigator url="/pages/trip?tripId={{tripId}}">
         <view class="trip">
             <view class="trip_header">
-                <navigator url="/pages/user?userId={{userId}}">
-                    <view class="trip_header_user" @tap.stop="showUserInfo">
+                <navigator url="/pages/user?userId={{userId}}" @tap.stop="()=>{}">
+                    <view class="trip_header_user">
                         <image src="{{userImg}}" />
                         <text>{{userName}}</text>
                     </view> 
@@ -66,7 +72,7 @@
             <view class="trip_location">
                 <text>目的地:</text>
                 <view>
-                    <repeat for="{{locationList}}">
+                    <repeat for="{{location}}">
                         <text class="location_item">{{item}}</text>
                     </repeat>
                 </view>
@@ -76,7 +82,7 @@
                 <text class="trip_time-value">{{startTime + '~' + endTime}}</text>
             </view>
         </view>
-    </navigator>
+    </navigator>  
 </template>
 <script>
     import wepy from 'wepy';
@@ -88,17 +94,12 @@
             userImg: String, //用户头像
             userName: String, //用户名称
             createTime: String, //创建时间
-            location: String, //目的地
+            location: Array, //目的地
             startTime: String, //开始时间
             endTime: String //结束时间
         };
-        computed = {
-            locationList () {
-                return this.location.split(',');
-            }
-        };
         onLoad (options) {
-            console.log(options);
+            console.log(this);
         };
     }
 </script>
