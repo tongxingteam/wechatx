@@ -93,7 +93,6 @@ export default class extends wepy.app {
     if (this.globalData.userInfo) {
       return this.globalData.userInfo
     }
-    console.log('88')
     wepy.getSetting({
       success: function(res) {
         if (res.authSetting['scope.userInfo']) {

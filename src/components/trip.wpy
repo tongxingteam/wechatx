@@ -61,7 +61,7 @@
     <navigator url="/pages/trip?tripId={{tripId}}">
         <view class="trip">
             <view class="trip_header">
-                <navigator url="/pages/user?userId={{userId}}" @tap.stop="()=>{}">
+                <navigator url="/pages/user?userId={{userId}}" @tap.stop="goToUser">
                     <view class="trip_header_user">
                         <image src="{{userImg}}" />
                         <text>{{userName}}</text>
@@ -86,6 +86,8 @@
 </template>
 <script>
     import wepy from 'wepy';
+    
+    import HttpService from '../util';
 
     export default class Trip extends wepy.component {
         props = {
@@ -98,8 +100,8 @@
             startTime: String, //开始时间
             endTime: String //结束时间
         };
-        onLoad (options) {
-            console.log(this);
+        methods = {
+            goToUser () {}
         };
     }
 </script>
