@@ -41,6 +41,19 @@
       width: 100%;
     }
   }
+  .release-btn {
+    width: 100rpx;
+    height: 100rpx;
+    border-radius: 50%;
+    background: #12C7DD;
+    color: #ffffff;
+    font-size: 28rpx;
+    text-align: center;
+    line-height: 100rpx;
+    position: fixed;
+    right: 40rpx;
+    bottom: 70rpx;
+  }
 </style>
 <template>
   <view class="container">
@@ -69,6 +82,9 @@
             />
         </repeat>
       </view>
+      <navigator url="/pages/publish">
+        <view class="release-btn">发布</view>
+      </navigator>
   </view>
 </template>
 
@@ -103,6 +119,36 @@
           userName: "张三李四",
           createTime: "2018-02-03",
           location: ["北京","天津","石家庄"],
+          startTime: "2018-04-12",
+          endTime: "2018-06-23",
+          userId: "uuidsdfsa23434"
+        },
+        {
+          tripId: 'trip123456',
+          userImg: "https://ss1.bdstatic.com/70cFuXSh_Q1YnxGkpoWK1HF6hhy/it/u=361264274,3451054389&fm=27&gp=0.jpg",
+          userName: "张三李四",
+          createTime: "2018-02-03",
+          location: ["北京"],
+          startTime: "2018-04-12",
+          endTime: "2018-06-23",
+          userId: "uuidsdfsa23434"
+        },
+        {
+          tripId: 'trip123456',
+          userImg: "https://ss1.bdstatic.com/70cFuXSh_Q1YnxGkpoWK1HF6hhy/it/u=361264274,3451054389&fm=27&gp=0.jpg",
+          userName: "张三李四",
+          createTime: "2018-02-03",
+          location: ["北京"],
+          startTime: "2018-04-12",
+          endTime: "2018-06-23",
+          userId: "uuidsdfsa23434"
+        },
+        {
+          tripId: 'trip123456',
+          userImg: "https://ss1.bdstatic.com/70cFuXSh_Q1YnxGkpoWK1HF6hhy/it/u=361264274,3451054389&fm=27&gp=0.jpg",
+          userName: "张三李四",
+          createTime: "2018-02-03",
+          location: ["北京"],
           startTime: "2018-04-12",
           endTime: "2018-06-23",
           userId: "uuidsdfsa23434"
