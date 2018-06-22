@@ -3,37 +3,49 @@
  */
 import wepy from 'wepy';
 
+import QueryTripListByWord from '../mock/queryTripListByWord';
+const mockData = {
+    queryTripListByWord: QueryTripListByWord
+};
+
+const DEBUG = true;
 const host = 'https://wxtx.ilvdudu.com/v1/';
 const HttpService = {
     // 接口map
     Apis: {
-        list: 'list' // 测试
+        queryTripListByWord: 'list' // 测试
     },
     _getUrl (name) {
-        return host + (HttpService.Apis['name'] || name);
+        return host + (HttpService.Apis[name] || name);
     },
-    Post (config) {
+    async Post (config) {
         wx.showLoading({
-            title: '请求中...',
+            title: '数据加载中',
             mask: true
         });
         const { urlName, data, success, fail, complete, page } = config;
-        return wepy.request({
-                    url: HttpService._getUrl(urlName),
-                    method: 'POST',
-                    header: {
-                        uid: wx.getStorageSync('uid'),
-                        page: page || 'notFound',
-                        platform: 'wechat',
-                        'content-type':'application/x-www-form-urlencoded'
-                    },
-                    data,
-                    success: HttpService._success.bind(HttpService, success),
-                    fail: HttpService._fail.bind(HttpService, fail),
-                    complete: HttpService._complete.bind(HttpService, complete)
+        if(DEBUG){
+            await sleep(3);
+            HttpService._success.bind(HttpService, success, fail)(mockData[urlName]());
+            complete && complete();
+        }else{
+            return wepy.request({
+                url: HttpService._getUrl(urlName),
+                method: 'POST',
+                header: {
+                    uid: wx.getStorageSync('uid'),
+                    page: page || 'notFound',
+                    platform: 'wechat',
+                    'content-type':'application/x-www-form-urlencoded'
+                },
+                data,
+                success: HttpService._success.bind(HttpService, success),
+                fail: HttpService._fail.bind(HttpService, fail),
+                complete: HttpService._complete.bind(HttpService, complete)
             });
+        }
     },
-    Get (config) {
+    async Get (config) {
         wx.showLoading({
             title: '请求中...',
             mask: true
@@ -43,28 +55,41 @@ const HttpService = {
         for(let key in data){
             params.push(`${key}=${data[key]}`);
         }
-        return wepy.request({
-                    url: HttpService._getUrl(urlName) + `?${params.join('&')}`,
-                    method: 'GET',
-                    header: {
-                        uid: wx.getStorageSync('uid'),
-                        page: page || 'notFound',
-                        platform: 'wechat'
-                    },
-                    success: HttpService._success.bind(HttpService, success),
-                    fail: HttpService._fail.bind(HttpService, fail),
-                    complete: HttpService._complete.bind(HttpService, complete)
-            });
-    },
-    _success (success, res, statusCode, header) {
-        const { code, msg, data} = res.data;
-        if(code === 20000){
-            success && success(code, data, msg);
-        }else if(code === 99999){
-            
+        if(DEBUG){
+            await sleep(3);
+            HttpService._success.bind(HttpService, success, fail)(mockData[urlName]());
+            complete && complete();
         }else{
-            console.error(msg);
+            return wepy.request({
+                url: HttpService._getUrl(urlName) + `?${params.join('&')}`,
+                method: 'GET',
+                header: {
+                    uid: wx.getStorageSync('uid'),
+                    page: page || 'notFound',
+                    platform: 'wechat'
+                },
+                success: HttpService._success.bind(HttpService, success),
+                fail: HttpService._fail.bind(HttpService, fail),
+                complete: HttpService._complete.bind(HttpService, complete)
+            });
         }
+    },
+    _success (success, fail, res, statusCode, header) {
+        const { code, msg, data} = res.data;
+        if(code > 19999 && code < 30000){
+            success && success(+code, data, msg);
+        }else if(code == 99999){ // 非法操作
+            wx.showToast({
+                title: '非法操作',
+                icon: 'none',
+                duration: 2500,
+                mask: true
+            });
+        }else{
+            fail && fail(msg);
+            console.log(msg);
+        }
+        this._complete();
     },
     _fail (fail, err) {
         fail && fail();
@@ -78,5 +103,13 @@ const HttpService = {
         complete && complete();
     }
 };
+
+function sleep(s){
+    return new Promise(function(resolve){
+        setTimeout(()=>{
+            resolve();
+        }, s*1000);
+    });
+}
 
 export default HttpService
