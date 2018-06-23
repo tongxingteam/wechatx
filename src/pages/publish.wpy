@@ -1,34 +1,91 @@
 <style lang="less">
+.placeholder {
+  margin: 5px;
+  padding: 0 10px;
+  text-align: center;
+  background-color: #ebebeb;
+  height: 2.3em;
+  line-height: 2.3em;
+  color: #cfcfcf;
+}
 </style>
 <template>
-    <view class="container">
-        行程发布页
-        <view class="box">
-            <view class="departure">
-                <view class="section">
-                <view class="section__title">省市区选择器</view>
-                    <picker mode="region" bindchange="bindRegionChange" value="{{region}}" custom-item="{{customItem}}">
-                        <view class="picker">
-                        当前选择：{{region[0]}}，{{region[1]}}，{{region[2]}}
+    <view class="page">
+        <view class="page__bd">
+            <view class="weui-btn-area">
+                <picker class="weui-btn" mode="region" @change="bindRegionChange">
+                    <view class="weui-cell">
+                        <view class="weui-cell__hd">
+                            <image src="{{icon}}" style="margin-right: 5px;vertical-align: middle;width:20px; height: 20px;"/>
                         </view>
-                    </picker>
-                </view>
+                        <view class="weui-cell__bd">出发地</view>
+                        <view class="weui-cell__ft">{{region}} ></view>
+                    </view>
+                </picker>
+                
+                <picker class="weui-btn" mode="date" value="{{goDate}}" @change="bindGoDateChange" start="2015-09-01" end="2018-09-01" >
+                    <view class="weui-cell">
+                        <view class="weui-cell__hd">
+                            <image src="{{icon}}" style="margin-right: 5px;vertical-align: middle;width:20px; height: 20px;"/>
+                        </view>
+                        <view class="weui-cell__bd">出发日期</view>
+                        <view class="weui-cell__ft">{{goDate}} ></view>
+                    </view>
+                </picker>
+                <picker class="weui-btn" mode="date" value="{{backDate}}" @change="bindBackDateChange" start="2015-09-01" end="2018-09-01" >
+                    <view class="weui-cell">
+                        <view class="weui-cell__hd">
+                            <image src="{{icon}}" style="margin-right: 5px;vertical-align: middle;width:20px; height: 20px;"/>
+                        </view>
+                        <view class="weui-cell__bd">出发日期</view>
+                        <view class="weui-cell__ft">{{backDate}} ></view>
+                    </view>
+                </picker>
             </view>
         </view>
     </view>
 </template>
 <script>
-import wepy from "wepy"
+import wepy from "wepy";
 
 export default class Publish extends wepy.page {
   config = {
     navigationBarTitleText: "发布"
-  }
+  };
   data = {
-    region: ['广东省', '广州市', '海珠区'],
-    customItem: '全部'
+    array: ["美国", "中国", "巴西", "日本"],
+    index: 0,
+    goDate: "2016-09-01",
+    backDate: "2018-06-22",
+    time: "12:01",
+    region: "北京",
+    icon: ""
+  };
+
+  methods = {
+    bindPickerChange(e) {
+      console.log("picker发送选择改变，携带值为", e.detail.value);
+      this.index = e.detail.value;
+    },
+    bindGoDateChange(e) {
+      console.log("picker发送选择改变，携带值为", e.detail.value);
+      this.goDate = e.detail.value;
+    },
+    bindBackDateChange(e) {
+      console.log("picker发送选择改变，携带值为", e.detail.value);
+      this.backDate = e.detail.value;
+    },
+    bindTimeChange(e) {
+      console.log("picker发送选择改变，携带值为", e.detail.value);
+      this.time = e.detail.value;
+    },
+    bindRegionChange(e) {
+      this.region = e.detail.value.join("-");
+    }
+  };
+  onLoad() {
+    this.icon = require("../images/base64.js").icon20;
   }
-  methods = {}
 }
 </script>
 
