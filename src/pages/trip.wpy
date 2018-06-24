@@ -17,6 +17,9 @@
       width: 45rpx;
       height: 45rpx;
     }
+    text {
+      margin-left: 10rpx;
+    }
   }
   .input-value {
     color: #999;
@@ -65,6 +68,7 @@
   }
 }
 .input-ellipsis {
+  width: 100%;
   display: flex;
   justify-content: flex-end;
   padding-bottom: 90rpx;
@@ -92,30 +96,31 @@
     <view class="container">
         <view class="inline-box">
             <view class="input-title">
-              <image src="{{user_avatar}}"/>
-              <text>{{username}}</text>
+              <image src="{{travel_data.publish_user_wx_portriat}}"/>
+              <text>{{travel_data.publish_user_wx_name}}</text>
             </view>
             <view class="input-value">
-              <text>{{release_time}}</text>
+              <text>{{travel_data.trip_create_time}}</text>
             </view>
         </view>
          <view class="inline-box">
             <view class="input-title">
-              <image src="{{place_icon}}"/>
+              <!-- <image src="{{place_icon}}"/> -->
+              <i class="iconfont tx-biaoji1"/>
               <text>出发地</text>
             </view>
             <view class="input-value">
-              <text>{{startRegionShow}}</text>
+              <text>{{travel_data.trip_start_location}}</text>
             </view>
         </view>
         <view class="inline-box" style="padding-bottom: 0;">
             <view class="input-title" style="width: 100%;">
-              <image src="{{place_icon}}"/>
+              <i class="iconfont tx-biaoji"/>
               <text>目的地</text>
             </view>
             <view class="input-value" style="width: 100%;padding: 10rpx 45rpx;">
                 <view class="end-location">
-                    <repeat for="{{endRegionShow}}" key="item">
+                    <repeat for="{{travel_data.trip_end_location}}" key="item">
                         <view data-index="{{index}}">{{item}}</view>
                     </repeat>    
                 </view>
@@ -123,51 +128,51 @@
         </view>
         <view class="inline-box">
             <view class="input-title">
-              <image src="{{place_icon}}"/>
+              <i class="iconfont tx-riqi"/>
               <text>出发日期</text>
             </view>
             <view class="input-value">
-              <text>{{startTime}}</text>
+              <text>{{travel_data.trip_start_time}}</text>
             </view>
         </view>
         <view class="inline-box">
             <view class="input-title">
-              <image src="{{place_icon}}"/>
+              <i class="iconfont tx-riqi"/>
               <text>返回日期</text>
             </view>
             <view class="input-value">
-              <text>{{endTime}}</text>
+              <text>{{travel_data.trip_end_time}}</text>
             </view>
         </view>
         <view class="inline-box">
             <view class="input-title">
-              <image src="{{place_icon}}"/>
+              <i class="iconfont tx-11"/>
               <text>最大人数</text>
             </view>
             <view class="input-value">
-              <text>{{people_number}}</text>
+              <text>{{travel_data.trip_member_count}}</text>
             </view>
         </view>
         <view class="inline-box" style="padding-bottom: 0;">
             <view class="input-title" style="width: 100%;">
-                <image src="{{place_icon}}"/>
-                <text>参团人数({{people_group_number}})</text>
+                <i class="iconfont tx-tonghang"/>
+                <text>参团人数({{travel_data.trip_member_info.length}})</text>
             </view>
             <view class="input-value" style="width: 100%;padding: 10rpx 45rpx;">
                 <view class="end-location">
-                    <repeat for="{{people_group}}" key="item">
-                        <image data-index="{{index}}" src="{{item.user_avatar}}"/>
+                    <repeat for="{{travel_data.trip_member_info}}" key="item">
+                        <image data-index="{{index}}" src="{{item.user_wx_portriat}}"/>
                     </repeat>    
                 </view>
             </view>
         </view>
         <view class="inline-box" style="padding-bottom: 0;">
             <view class="input-title" style="width: 100%;">
-                <image src="{{place_icon}}"/>
+                <i class="iconfont tx-description"/>
                 <text>约伴要求</text>
             </view>
             <view class="input-value" style="width: 100%;padding: 10rpx 45rpx;">
-                <view class="end-location">{{Requirement}}</view>
+                <view class="end-location">{{travel_data.trip_other_desc}}</view>
             </view>
         </view>
         <view>
@@ -176,10 +181,10 @@
             </view>
         </view>
         <view wx:if="{{is_publish_user}}" class="inline-box" style="border:0;padding: 10rpx 10rpx;">
-            <button class="pub-btn" @tap.stop="applyForGroup">申请参团</button>
+            <button class="pub-btn" @tap.stop="applyForGroup" data-id="{{travel_data.trip_id}}">申请参团</button>
         </view>
         <view wx:else class="inline-box" style="border:0;padding: 10rpx 10rpx;">
-          <navigator url="/pages/apply_list">
+          <navigator url="/pages/apply_list?id='{{travel_data.trip_id}}'">
             <button class="pub-btn">查看申请列表</button>
           </navigator>
         </view>
@@ -187,27 +192,30 @@
 </template>
 <script>
 import wepy from "wepy";
+import HttpService from "../util";
 
 export default class Trip extends wepy.page {
   config = {
     navigationBarTitleText: "约伴详情"
   };
   data = {
+    travel_data: {
+      publish_user_id: "123",
+      publish_user_wx_name: "里斯本",
+      publish_user_wx_portriat: "../images/icon_intro.png",
+      trip_create_time: "2018-02-03",
+      trip_start_location: "北京",//出发地
+      trip_end_location: ['西安','上海'],
+      trip_start_time: '2018-03-23',
+      trip_end_time: '2018-03-25',
+      trip_member_count: '5',
+      trip_member_info: [{user_id: '111',user_wx_portriat: '../images/icon_intro.png'},{user_id: '111',user_wx_portriat: '../images/icon_intro.png'}],
+      trip_other_desc: '行程要求',
+      trip_status: '行程状态',
+      trip_id: '行程id号',
+      apply_status_to_add: '当前用户对于此行程的状态'
+    },
     place_icon: "../images/place_icon.png",
-    username: "李四",
-    user_avatar: "../images/icon_intro.png",
-    release_time: "5分钟前",
-    startRegionShow: "北京-东城区",
-    endRegionShow: ["北京-东城区", "北京-海淀区"],
-    startTime: "2018-06-19",
-    endTime: "2018-06-23",
-    people_number: "5",
-    people_group_number: "2",
-    people_group: [
-      { user_avatar: "../images/icon_intro.png", user_id: 1 },
-      { user_avatar: "../images/icon_intro.png", user_id: 2 }
-    ],
-    Requirement: "这里是约伴要求！",
     is_publish_user: false
   };
   methods = {
@@ -215,6 +223,53 @@ export default class Trip extends wepy.page {
       console.log('申请参团！')
     }
   };
+  requestTripDetail(callback) {
+    HttpService.Post({
+      urlName: "queryTripDetail",
+      data: {
+        trip_id: "5cbe08506b0011e8a53a53d3bea89acf",
+        user_id: "b019406067d511e89c437132ae595195",
+        // user_id: "a019406067d511e89c437132ae595195",
+      },
+      success: (code, data, msg) => {
+        console.log(code);
+        /* 查询记录成功 */
+        if (code === 20000) {
+          console.log(data);
+          // const { count, list } = data;
+          
+          this.$apply();
+        } else {
+          /* 查询记录失败 */
+          if (pageNo === 1) {
+            this.upperControl.show("这里好像有bug");
+          } else {
+            this.upperControl.show("加载失败");
+          }
+          this.$apply();
+        }
+      },
+      fail: msg => {
+        wx.showToast({
+          title: "失败",
+          icon: "none"
+        });
+        if (pageNo === 1) {
+          this.upperControl.show("这里好像有bug");
+        } else {
+          this.upperControl.show("加载失败");
+        }
+        this.$apply();
+      },
+      complete: () => {
+        callback && callback();
+        console.log("请求完成");
+      }
+    });
+  }
+  onLoad() {
+    this.requestTripDetail()
+  }
 }
 </script>
 

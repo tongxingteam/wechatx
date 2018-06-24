@@ -35,9 +35,12 @@ view {
     font-weight: bold;
   }
   .sug_info {
-    display: none;
-    background-color: #bbbbbb;
-    padding: 20rpx;
+    background-color: #eeeeee;
+    .sug_info_item {
+      font-size: 24rpx;
+      color: #333;
+      padding: 10rpx 20rpx;
+    }
   }
 }
 .trip-list {
@@ -92,9 +95,11 @@ view {
       </swiper>
       <view class="search-box">
         <icon class="search-icon" type="search" size="20" color="#FFFFFF"/>
-        <input confirm-type="search" placeholder-style="color:#FFFFFF" placeholder="关键字查询" bindinput="bindKeyInput"/>
+        <input confirm-type="search" value="{{searchValue}}" placeholder-style="color:#FFFFFF" bindconfirm="search" placeholder="关键字查询" bindinput="bindKeyInput"/>
         <view class="sug_info"> 
-          <text>{{sugData}}</text> 
+          <repeat for="{{sugData}}" key="index" index="index" item="item">
+            <view class="sug_info_item" @tap.stop="handleSearch" data-name="{{item.name}}">{{item.name}}</view>
+          </repeat>
         </view>
       </view>
       <view class="trip-list">
@@ -159,7 +164,8 @@ export default class Index extends wepy.page {
     tripList: [], // 行程列表数据
     viewHeight: 500, //信息展示窗口的高度
     upperMsg: "",
-    sugData: ""
+    sugData: [],
+    searchValue: ''
   };
   // 上滑显示提示
   upperControl = {
@@ -200,6 +206,8 @@ export default class Index extends wepy.page {
     },
     // 搜索
     search(event) {
+      this.sugData = [];
+      this.$apply();
       if (this.selfData.pending === false) {
         this.selfData.pending = true;
         this.selfData.keyword = event.detail.value
@@ -217,7 +225,6 @@ export default class Index extends wepy.page {
       }
     },
     bindKeyInput: function(e) {
-      console.log(e);
       var that = this;
       // 新建百度地图对象
       var BMap = new bmap.BMapWX({
@@ -227,13 +234,13 @@ export default class Index extends wepy.page {
         console.log(data);
       };
       var success = function(data) {
-        console.log(data.result)
-        var sugData = "";
-        for (var i = 0; i < data.result.length; i++) {
-          sugData = sugData + data.result[i].name + "\n";
-        }
-        that.sugData = sugData;
-        that.$apply()
+        // console.log(data.result);
+        // var sugData = "";
+        // for (var i = 0; i < data.result.length; i++) {
+        //   sugData = sugData + data.result[i].name + "\n";
+        // }
+        that.sugData = data.result;
+        that.$apply();
         // that.setData({
         //   sugData: sugData
         // });
@@ -246,6 +253,16 @@ export default class Index extends wepy.page {
         fail: fail,
         success: success
       });
+    },
+    handleSearch: function(e) {
+      console.log(e.target.dataset.name);
+      this.sugData = [];
+      var search_keyword = e.target.dataset.name
+      this.searchValue = search_keyword;
+      this.$apply();
+      this.requestTripList(search_keyword, 1, 10, function(){
+
+      })
     }
   };
   // 请求行程数据

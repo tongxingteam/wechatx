@@ -21,10 +21,11 @@ import 'wepy-async-function'
 export default class extends wepy.app {
   config = {
     pages: [
+        'pages/trip', // 行程详情
         // 'pages/publish', // 发布
         'pages/index', // 首页
         'pages/publish', // 发布
-        'pages/trip', // 行程详情
+        // 'pages/trip', // 行程详情
         'pages/user', // 个人主页
         'pages/message', // 消息
         'pages/discovery', // 发现

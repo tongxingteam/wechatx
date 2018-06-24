@@ -11,7 +11,7 @@ const mockData = {
     publishTrip: PublishTrip
 };
 
-const DEBUG = true;
+const DEBUG = false;
 const host = 'https://wxtx.ilvdudu.com/v1/';
 const HttpService = {
     // 接口map
