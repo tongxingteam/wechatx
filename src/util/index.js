@@ -16,7 +16,8 @@ const host = 'https://wxtx.ilvdudu.com/v1/';
 const HttpService = {
     // 接口map
     Apis: {
-        queryTripListByWord: 'list' // 测试
+        queryTripListByWord: 'queryTripListByWord', // 查询行程列表
+        publishTrip: 'publishTrip' //  发布行程
     },
     _getUrl (name) {
         return host + (HttpService.Apis[name] || name);
@@ -76,23 +77,20 @@ const HttpService = {
         }
 
         const { code, msg, data} = res.data;
-        if(typeof data === 'undefined'){
-            fail && fail(msg);
+       
+        if(code === 20000){
+            success && success(+code, data, msg);
         }else{
-            if(code === 20000){
-                success && success(+code, data, msg);
-            }else{
-                if(code === 99999){ // 非法操作
-                    wx.showToast({
-                        title: '非法操作',
-                        icon: 'none',
-                        duration: 2500,
-                        mask: true
-                    });
-                }
-                fail && fail(msg);
-                console.log(msg);
+            if(code === 99999){ // 非法操作
+                wx.showToast({
+                    title: '非法操作',
+                    icon: 'none',
+                    duration: 2500,
+                    mask: true
+                });
             }
+            fail && fail(msg);
+            console.log(msg);
         }
     },
     _fail (fail, err) {
