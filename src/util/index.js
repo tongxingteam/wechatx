@@ -4,8 +4,11 @@
 import wepy from 'wepy';
 
 import QueryTripListByWord from '../mock/queryTripListByWord';
+import PublishTrip from '../mock/publishTrip';
+
 const mockData = {
-    queryTripListByWord: QueryTripListByWord
+    queryTripListByWord: QueryTripListByWord,
+    publishTrip: PublishTrip
 };
 
 const DEBUG = true;
@@ -34,7 +37,7 @@ const HttpService = {
                 method: 'POST',
                 header: {
                     uid: wx.getStorageSync('uid'),
-                    page: page || 'notFound',
+                    page: page || '',
                     platform: 'wechat',
                     'content-type':'application/x-www-form-urlencoded'
                 },
