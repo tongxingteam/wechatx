@@ -1,16 +1,220 @@
 <style lang="less">
+.inline-box {
+  padding: 20rpx 20rpx;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-content: center;
+  flex-wrap: wrap;
+  font-size: 32rpx;
+  border-bottom: 1px solid #ddd;
+  .input-title {
+    color: #333;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    image {
+      width: 45rpx;
+      height: 45rpx;
+    }
+  }
+  .input-value {
+    color: #999;
+    .add-region {
+      width: 100%;
+      height: 45rpx;
+      color: #333;
+      text-align: center;
+      line-height: 40rpx;
+      font-size: 36rpx;
+      color: rgba(18, 199, 211, 1);
+      background-color: rgba(248, 248, 248, 1);
+      border-radius: 8rpx;
+    }
+    .end-location {
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      flex-wrap: wrap;
+      > view {
+        flex: 0 0 auto;
+        border: 1px solid #ddd;
+        padding: 5rpx 10rpx;
+        margin-right: 20rpx;
+        margin-bottom: 10rpx;
+        border-radius: 6rpx;
+      }
+      image {
+        width: 45rpx;
+        height: 45rpx;
+        margin-left: 10rpx;
+      }
+    }
 
+    .desc-textarea {
+      font-size: 30rpx;
+      border: 1px solid rgba(248, 248, 248, 1);
+      border-radius: 8rpx;
+      height: 200rpx;
+      width: 100%;
+      padding: 10rpx 15rpx;
+    }
+    .desc-textarea-placeholder {
+      color: #ddd;
+    }
+  }
+}
+.input-ellipsis {
+  display: flex;
+  justify-content: flex-end;
+  padding-bottom: 90rpx;
+  image {
+    width: 45rpx;
+    height: 45rpx;
+    margin-left: 10rpx;
+    margin-top: 15rpx;
+  }
+}
+.pub-btn {
+  position: fixed;
+  bottom: 0rpx;
+  left: 0rpx;
+  width: 100%;
+  background-color: rgba(18, 199, 211, 1);
+  color: #fff;
+  border-radius: 8rpx;
+  &:active {
+    background-color: rgb(20, 176, 187, 1);
+  }
+}
 </style>
 <template>
-    <view>
-        行程详情页
+    <view class="container">
+        <view class="inline-box">
+            <view class="input-title">
+              <image src="{{user_avatar}}"/>
+              <text>{{username}}</text>
+            </view>
+            <view class="input-value">
+              <text>{{release_time}}</text>
+            </view>
+        </view>
+         <view class="inline-box">
+            <view class="input-title">
+              <image src="{{place_icon}}"/>
+              <text>出发地</text>
+            </view>
+            <view class="input-value">
+              <text>{{startRegionShow}}</text>
+            </view>
+        </view>
+        <view class="inline-box" style="padding-bottom: 0;">
+            <view class="input-title" style="width: 100%;">
+              <image src="{{place_icon}}"/>
+              <text>目的地</text>
+            </view>
+            <view class="input-value" style="width: 100%;padding: 10rpx 45rpx;">
+                <view class="end-location">
+                    <repeat for="{{endRegionShow}}" key="item">
+                        <view data-index="{{index}}">{{item}}</view>
+                    </repeat>    
+                </view>
+            </view>
+        </view>
+        <view class="inline-box">
+            <view class="input-title">
+              <image src="{{place_icon}}"/>
+              <text>出发日期</text>
+            </view>
+            <view class="input-value">
+              <text>{{startTime}}</text>
+            </view>
+        </view>
+        <view class="inline-box">
+            <view class="input-title">
+              <image src="{{place_icon}}"/>
+              <text>返回日期</text>
+            </view>
+            <view class="input-value">
+              <text>{{endTime}}</text>
+            </view>
+        </view>
+        <view class="inline-box">
+            <view class="input-title">
+              <image src="{{place_icon}}"/>
+              <text>最大人数</text>
+            </view>
+            <view class="input-value">
+              <text>{{people_number}}</text>
+            </view>
+        </view>
+        <view class="inline-box" style="padding-bottom: 0;">
+            <view class="input-title" style="width: 100%;">
+                <image src="{{place_icon}}"/>
+                <text>参团人数({{people_group_number}})</text>
+            </view>
+            <view class="input-value" style="width: 100%;padding: 10rpx 45rpx;">
+                <view class="end-location">
+                    <repeat for="{{people_group}}" key="item">
+                        <image data-index="{{index}}" src="{{item.user_avatar}}"/>
+                    </repeat>    
+                </view>
+            </view>
+        </view>
+        <view class="inline-box" style="padding-bottom: 0;">
+            <view class="input-title" style="width: 100%;">
+                <image src="{{place_icon}}"/>
+                <text>约伴要求</text>
+            </view>
+            <view class="input-value" style="width: 100%;padding: 10rpx 45rpx;">
+                <view class="end-location">{{Requirement}}</view>
+            </view>
+        </view>
+        <view>
+            <view class="input-ellipsis">
+              <image src='../images/ellipsis_icon.png'/>
+            </view>
+        </view>
+        <view wx:if="{{is_publish_user}}" class="inline-box" style="border:0;padding: 10rpx 10rpx;">
+            <button class="pub-btn" @tap.stop="applyForGroup">申请参团</button>
+        </view>
+        <view wx:else class="inline-box" style="border:0;padding: 10rpx 10rpx;">
+          <navigator url="/pages/apply_list">
+            <button class="pub-btn">查看申请列表</button>
+          </navigator>
+        </view>
     </view>
 </template>
 <script>
-    import wepy from 'wepy';
+import wepy from "wepy";
 
-    export default class Trip extends wepy.page {
-
+export default class Trip extends wepy.page {
+  config = {
+    navigationBarTitleText: "约伴详情"
+  };
+  data = {
+    place_icon: "../images/place_icon.png",
+    username: "李四",
+    user_avatar: "../images/icon_intro.png",
+    release_time: "5分钟前",
+    startRegionShow: "北京-东城区",
+    endRegionShow: ["北京-东城区", "北京-海淀区"],
+    startTime: "2018-06-19",
+    endTime: "2018-06-23",
+    people_number: "5",
+    people_group_number: "2",
+    people_group: [
+      { user_avatar: "../images/icon_intro.png", user_id: 1 },
+      { user_avatar: "../images/icon_intro.png", user_id: 2 }
+    ],
+    Requirement: "这里是约伴要求！",
+    is_publish_user: false
+  };
+  methods = {
+    applyForGroup(){
+      console.log('申请参团！')
     }
+  };
+}
 </script>
 

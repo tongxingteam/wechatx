@@ -1,4 +1,7 @@
 <style lang="less">
+  .container{
+    position: relative;
+  }
   view {
     box-sizing: border-box;
   }
@@ -9,24 +12,27 @@
     box-sizing: border-box;
   }
   .search-box {
-    width: 100%;
-    position: fixed;
-    top: 10rpx;
-    padding: 0 10rpx;
+    width: 690rpx;
+    position: absolute;
+    top: 8rpx;
+    left: 30rpx;
+    border: 1rpx solid rgba(255, 255, 255, .2);
+    border-radius: 8rpx;
+    background-color: rgba(255, 255, 255, .3);
+    box-shadow: 0 0 8rpx rgba(0, 0, 0, .3);
     input {
-      height: 80rpx;
-      line-height: 80rpx;
-      font-size: 32rpx;
-      color: #ffffff;
-      border-radius: 10rpx;
-      border: 1rpx solid rgba(16, 16, 16, 0.2);
+      height: 60rpx;
+      line-height: 60rpx;
+      font-size: 24rpx;
+      color: #fff;
       padding-right: 10rpx;
-      padding-left: 85rpx;
+      padding-left: 60rpx;
     }
     .search-icon {
       position: absolute;
       top: 12rpx;
-      left: 20rpx;
+      left: 12rpx;
+      font-weight: bold;
     }
   }
   .trip-list{
@@ -41,22 +47,37 @@
       width: 100%;
     }
   }
-  .release-btn {
-    width: 100rpx;
-    height: 100rpx;
-    border-radius: 50%;
-    background: #12C7DD;
-    color: #ffffff;
-    font-size: 28rpx;
+  .upper_tip{
+    width: 100%;
+    height: 30px;
+    line-height: 30px;
     text-align: center;
-    line-height: 100rpx;
+    background-color: transparent;
+    color: #ddd;
+    font-size: 30rpx;
+  }
+  .pub-btn{
     position: fixed;
-    right: 40rpx;
-    bottom: 70rpx;
+    bottom: 100rpx;
+    right: 30rpx;
+    width: 90rpx;
+    height: 90rpx;
+    line-height: 90rpx;
+    text-align: center;
+    border-radius: 50%;
+    border: 1px solid rgba(18, 199, 211, .8);
+    background-color: rgba(18, 199, 211, .8);
+    color: rgba(248, 248, 248, 1);
+    font-size: 30rpx;
+    box-shadow: 0 0 10rpx rgba(0,0,0,.8);
+    &:active{
+      background-color: rgba(18, 199, 211, 1);
+    }
   }
 </style>
 <template>
   <view class="container">
+    <scroll-view scroll-y style="height: {{viewHeight+'px'}}" lower-threshold="30" bindscrolltolower="loadMoreTrip">
       <swiper class="banner" indicator-dots="{{indicatorDots}}" autoplay="{{autoplay}}" interval='{{interval}}' duration="{{duration}}">
         <block wx:for="{{imgUrls}}" wx:key="key">
           <swiper-item>
@@ -65,8 +86,8 @@
         </block>
       </swiper>
       <view class="search-box">
-        <icon class="search-icon" type="search" size="32" color="#FFFFFF"/>
-        <input confirm-type="search" placeholder-style="color:#FFFFFF" placeholder="关键字查询" />
+        <icon class="search-icon" type="search" size="20" color="#FFFFFF"/>
+        <input confirm-type="search" placeholder-style="color:#FFFFFF" placeholder="关键字查询" bindconfirm="search"/>
       </view>
       <view class="trip-list">
         <repeat for="{{tripList}}" key="key">
@@ -82,16 +103,21 @@
             />
         </repeat>
       </view>
-      <navigator url="/pages/publish">
-        <view class="release-btn">发布</view>
-      </navigator>
+      <view class="upper_tip">
+        <text>{{upperMsg}}</text>
+      </view>
+    </scroll-view>
+    <navigator url="/pages/publish">
+      <view class="pub-btn" >
+        <text>发布</text>
+      </view>
+    </navigator>  
   </view>
 </template>
 
 <script>
   import wepy from 'wepy'
   import Trip from '../components/trip'
-  import url from '../config/url'
   import HttpService from '../util';
 
   export default class Index extends wepy.page {
@@ -101,7 +127,14 @@
     components = {
         Trip
     }
-
+    selfData = {
+      keyword: '',
+      pageNo: 1, // 当前页
+      pageSize: 10, // 每页的数量
+      count: 35, // 总数据量
+      done: false, // 是否加载完全部数据
+      pending: false // 是否正在请求分页数据
+    }
     data = {
       canIUse: wepy.canIUse('button.open-type.getUserInfo'),
       userInfo: null || '暂无数据',
@@ -114,103 +147,144 @@
       autoplay: true,
       interval: 5000,
       duration: 1000,
-      tripList: [
-        {
-          tripId: 'trip123456',
-          userImg: "https://ss1.bdstatic.com/70cFuXSh_Q1YnxGkpoWK1HF6hhy/it/u=361264274,3451054389&fm=27&gp=0.jpg",
-          userName: "张三李四",
-          createTime: "2018-02-03",
-          location: ["北京","天津","石家庄"],
-          startTime: "2018-04-12",
-          endTime: "2018-06-23",
-          userId: "uuidsdfsa23434"
-        },
-        {
-          tripId: 'trip123456',
-          userImg: "https://ss1.bdstatic.com/70cFuXSh_Q1YnxGkpoWK1HF6hhy/it/u=361264274,3451054389&fm=27&gp=0.jpg",
-          userName: "张三李四",
-          createTime: "2018-02-03",
-          location: ["北京"],
-          startTime: "2018-04-12",
-          endTime: "2018-06-23",
-          userId: "uuidsdfsa23434"
-        },
-        {
-          tripId: 'trip123456',
-          userImg: "https://ss1.bdstatic.com/70cFuXSh_Q1YnxGkpoWK1HF6hhy/it/u=361264274,3451054389&fm=27&gp=0.jpg",
-          userName: "张三李四",
-          createTime: "2018-02-03",
-          location: ["北京"],
-          startTime: "2018-04-12",
-          endTime: "2018-06-23",
-          userId: "uuidsdfsa23434"
-        },
-        {
-          tripId: 'trip123456',
-          userImg: "https://ss1.bdstatic.com/70cFuXSh_Q1YnxGkpoWK1HF6hhy/it/u=361264274,3451054389&fm=27&gp=0.jpg",
-          userName: "张三李四",
-          createTime: "2018-02-03",
-          location: ["北京"],
-          startTime: "2018-04-12",
-          endTime: "2018-06-23",
-          userId: "uuidsdfsa23434"
-        },
-        {
-          tripId: 'trip123456',
-          userImg: "https://ss1.bdstatic.com/70cFuXSh_Q1YnxGkpoWK1HF6hhy/it/u=361264274,3451054389&fm=27&gp=0.jpg",
-          userName: "张三李四",
-          createTime: "2018-02-03",
-          location: ["北京"],
-          startTime: "2018-04-12",
-          endTime: "2018-06-23",
-          userId: "uuidsdfsa23434"
-        }
-      ]
+      tripList: [], // 行程列表数据
+      viewHeight: 500, //信息展示窗口的高度
+      upperMsg: ''
     }
-
-    methods = {
-      bindGetUserInfo: function(e) {
-        if (e.source.data.userInfo) {
-          console.log('用户已经授权！')
-        } else {
-          console.log('用户按了拒绝按钮')
-        }
+    // 上滑显示提示
+    upperControl = {
+      show: (msg) => {
+        this.upperMsg = msg;
       },
-      getUserInfo: function() {
-        this.$parent.getUserInfo(function(data) {
-          console.log(data)
-        })
+      hide: () => {
+        this.upperMsg = '';
       }
     }
-
+    methods = {
+      // bindGetUserInfo: function(e) {
+      //   if (e.source.data.userInfo) {
+      //     console.log('用户已经授权！')
+      //   } else {
+      //     console.log('用户按了拒绝按钮')
+      //   }
+      // },
+      // getUserInfo: function() {
+      //   this.$parent.getUserInfo(function(data) {
+      //     console.log(data)
+      //   })
+      // },
+      // 加载更多行程信息
+      loadMoreTrip(){
+        if(this.selfData.pending === false && this.selfData.done === false){
+          this.selfData.pending = true;
+          this.selfData.pageNo++;
+          this.requestTripList(
+            this.selfData.keyword, 
+            this.selfData.pageNo, 
+            this.selfData.pageSize, 
+            () => {
+              this.selfData.pending = false;
+            }
+          );
+        }
+      },
+      // 搜索
+      search(event){
+        if(this.selfData.pending === false){
+          this.selfData.pending = true;
+          this.selfData.keyword = event.detail.value.replace(/^\s+/, '').replace(/\s+$/, '');
+          this.selfData.pageNo = 1;
+          this.requestTripList(
+            this.selfData.keyword, 
+            this.selfData.pageNo, 
+            this.selfData.pageSize, 
+            () => {
+              this.selfData.pending = false;
+            });
+        }
+      }
+    }
+    // 请求行程数据
+    requestTripList(keyword = '', pageNo = 1, pageSize = 10, callback){
+      HttpService.Post({
+            urlName: 'queryTripListByWord',
+            data: {
+                keyword,
+                pageNo,
+                pageSize
+            },
+            success: (code, data, msg) => {
+              /* 查询记录成功 */
+              if(code === 20000){
+                const { count, list } = data;
+                this.selfData.count = count;
+                if(count === 0){
+                  // 暂无数据
+                  this.upperControl.show(`没有搜索到"${keyword}"相关的行程`);
+                }else{
+                  if(pageNo === 1){
+                    // 新查询
+                    this.tripList = list;
+                    this.upperControl.show('加载中...');
+                  }else{
+                    // 后续的分页查询
+                    this.tripList = [...this.tripList, ...list];
+                  }
+                  if(pageNo * pageSize >= this.selfData.count){
+                    this.selfData.done = true;
+                    this.upperControl.show('--- 这是我的底线了 ---');
+                  }else{
+                    this.selfData.done = false;
+                  }
+                }
+                this.$apply();
+              }else{
+              /* 查询记录失败 */
+                if(pageNo === 1){
+                  this.upperControl.show('这里好像有bug');
+                }else{
+                  this.upperControl.show('加载失败');
+                }
+                this.$apply();
+              }
+            },
+            fail: (msg) => {
+                wx.showToast({
+                    title: '失败',
+                    icon: 'none'
+                });
+                if(pageNo === 1){
+                  this.upperControl.show('这里好像有bug');
+                }else{
+                  this.upperControl.show('加载失败');
+                }
+                this.$apply();
+            },
+            complete: () => {
+              callback && callback();
+              console.log('请求完成');
+            }
+      });
+    }
     onLoad() {
-      // 请求测试
-      HttpService.Get({
-          urlName: 'list',
-          data: {
-              page: 1
-          },
-          success (code, data, msg) {
-              wx.showToast({
-                  title: '成功'+code,
-                  icon: 'success'
-              });
-              console.log('测试请求数据:' + data);
-          },
-          fail () {
-              wx.showToast({
-                  title: '成功',
-                  icon: 'success'
-              });
-          },
-          complete () {
+      // 初始化视图高度
+      this.viewHeight = wx.getSystemInfoSync().windowHeight;
 
-          }
-      });
-      this.$parent.getUserInfo((data) => {
-        this.userInfo = data
-        this.$apply()
-      });
+      // 初始化数据请求
+      const { keyword, pageNo, pageSize } = this.selfData;
+      this.requestTripList(
+        keyword, 
+        pageNo, 
+        pageSize, 
+        () => {
+          this.selfData.pending = false;
+        }
+      );
+
+      // this.$parent.getUserInfo((data) => {
+      //   this.userInfo = data
+      //   this.$apply()
+      // });
     }
   }
 </script>

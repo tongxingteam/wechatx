@@ -1,47 +1,153 @@
 <style lang="less">
-.placeholder {
-  margin: 5px;
-  padding: 0 10px;
-  text-align: center;
-  background-color: #ebebeb;
-  height: 2.3em;
-  line-height: 2.3em;
-  color: #cfcfcf;
+.inline-box {
+  padding: 20rpx 20rpx;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-content: center;
+  flex-wrap: wrap;
+  font-size: 32rpx;
+  border-bottom: 1px solid #ddd;
+  .input-title {
+    color: #333;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    image {
+      width: 45rpx;
+      height: 45rpx;
+    }
+  }
+  .input-value {
+    color: #999;
+    .add-region {
+      width: 100%;
+      height: 45rpx;
+      color: #333;
+      text-align: center;
+      line-height: 40rpx;
+      font-size: 36rpx;
+      color: rgba(18, 199, 211, 1);
+      background-color: rgba(248, 248, 248, 1);
+      border-radius: 8rpx;
+    }
+    .end-location {
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      flex-wrap: wrap;
+      > view {
+        flex: 0 0 auto;
+        border: 1px solid #ddd;
+        padding: 5rpx 10rpx;
+        margin-right: 20rpx;
+        margin-bottom: 10rpx;
+        border-radius: 6rpx;
+      }
+    }
+    .desc-textarea {
+      font-size: 30rpx;
+      border: 1px solid rgba(248, 248, 248, 1);
+      border-radius: 8rpx;
+      height: 200rpx;
+      width: 100%;
+      padding: 10rpx 15rpx;
+    }
+    .desc-textarea-placeholder {
+      color: #ddd;
+    }
+  }
+}
+.pub-btn {
+  position: fixed;
+  bottom: 0rpx;
+  left: 0rpx;
+  width: 100%;
+  background-color: rgba(18, 199, 211, 1);
+  color: #fff;
+  border-radius: 8rpx;
+  &:active {
+    background-color: rgb(20, 176, 187, 1);
+  }
 }
 </style>
 <template>
-    <view class="page">
-        <view class="page__bd">
-            <view class="weui-btn-area">
-                <picker class="weui-btn" mode="region" @change="bindRegionChange">
-                    <view class="weui-cell">
-                        <view class="weui-cell__hd">
-                            <image src="{{icon}}" style="margin-right: 5px;vertical-align: middle;width:20px; height: 20px;"/>
-                        </view>
-                        <view class="weui-cell__bd">出发地</view>
-                        <view class="weui-cell__ft">{{region}} ></view>
-                    </view>
-                </picker>
-                
-                <picker class="weui-btn" mode="date" value="{{goDate}}" @change="bindGoDateChange" start="2015-09-01" end="2018-09-01" >
-                    <view class="weui-cell">
-                        <view class="weui-cell__hd">
-                            <image src="{{icon}}" style="margin-right: 5px;vertical-align: middle;width:20px; height: 20px;"/>
-                        </view>
-                        <view class="weui-cell__bd">出发日期</view>
-                        <view class="weui-cell__ft">{{goDate}} ></view>
-                    </view>
-                </picker>
-                <picker class="weui-btn" mode="date" value="{{backDate}}" @change="bindBackDateChange" start="2015-09-01" end="2018-09-01" >
-                    <view class="weui-cell">
-                        <view class="weui-cell__hd">
-                            <image src="{{icon}}" style="margin-right: 5px;vertical-align: middle;width:20px; height: 20px;"/>
-                        </view>
-                        <view class="weui-cell__bd">出发日期</view>
-                        <view class="weui-cell__ft">{{backDate}} ></view>
-                    </view>
+    <view class="container">
+        <view class="inline-box">
+            <view class="input-title">
+                <image src="https://ss2.bdstatic.com/70cFvnSh_Q1YnxGkpoWK1HF6hhy/it/u=1134797552,1476775404&fm=27&gp=0.jpg"></image>
+                <text>出发地</text>
+            </view>
+            <view class="input-value">
+                <picker mode="region" @change="selectStartLocation" value="{{startRegion}}">
+                    <text>{{startRegionShow}}</text>
+                    <text> > </text>
                 </picker>
             </view>
+        </view>
+        <view class="inline-box" style="padding-bottom: 0;">
+            <view class="input-title" style="width: 100%;">
+                <image src="https://ss2.bdstatic.com/70cFvnSh_Q1YnxGkpoWK1HF6hhy/it/u=1134797552,1476775404&fm=27&gp=0.jpg"></image>
+                <text>目的地</text>
+            </view>
+            <view class="input-value" style="width: 100%;padding: 10rpx 45rpx;">
+                <view class="end-location">
+                    <repeat for="{{endRegionShow}}" key="item">
+                        <view @tap.stop="removeEndRegion" data-index="{{index}}">{{item}}</view>
+                    </repeat>    
+                </view>
+                <picker mode="region" @change="selectEndLocation" value="{{endRegion}}">    
+                    <view class="add-region" hidden="{{hideAddBtn}}">+</view>
+                </picker>
+            </view>
+        </view>
+        <view class="inline-box">
+            <view class="input-title">
+                <image src="https://ss2.bdstatic.com/70cFvnSh_Q1YnxGkpoWK1HF6hhy/it/u=1134797552,1476775404&fm=27&gp=0.jpg"></image>
+                <text>出发日期</text>
+            </view>
+            <view class="input-value">
+                <picker mode="date" @change="selectStartTime" value="{{startTime}}" start="{{startTimeRange.start}}" end="{{startTimeRange.end}}">
+                    <text>{{startTime}}</text>
+                    <text> > </text>
+                </picker>
+            </view>
+        </view>
+        <view class="inline-box">
+            <view class="input-title">
+                <image src="https://ss2.bdstatic.com/70cFvnSh_Q1YnxGkpoWK1HF6hhy/it/u=1134797552,1476775404&fm=27&gp=0.jpg"></image>
+                <text>返回日期</text>
+            </view>
+            <view class="input-value">
+                <picker mode="date" @change="selectEndTime" value="{{endTime}}" start="{{endTimeRange.start}}" bindend="{{endTimeRange.end}}">
+                    <text>{{endTime}}</text>
+                    <text> > </text>
+                </picker>
+            </view>
+        </view>
+        <view class="inline-box">
+            <view class="input-title">
+                <image src="https://ss2.bdstatic.com/70cFvnSh_Q1YnxGkpoWK1HF6hhy/it/u=1134797552,1476775404&fm=27&gp=0.jpg"></image>
+                <text>参团人数</text>
+            </view>
+            <view class="input-value">
+                <picker mode="selector" @change="selectPeople" value="{{peopleKey}}" range="{{peopleRange}}">
+                    <text>{{people}}</text>
+                    <text> > </text>
+                </picker>
+            </view>
+        </view>
+        <view class="inline-box">
+            <view class="input-title">
+                <image src="https://ss2.bdstatic.com/70cFvnSh_Q1YnxGkpoWK1HF6hhy/it/u=1134797552,1476775404&fm=27&gp=0.jpg"></image>
+                <text>行程说明</text>
+            </view>
+            <view class="input-value" style="width: 100%;padding: 10rpx 45rpx;">
+                <textarea class="desc-textarea" placeholder-class="desc-textarea-placeholder" value="{{otherDesc}}" maxlength="50" placeholder="请填写" bindconfirm="confirmDesc"></textarea>
+            </view>
+        </view>
+        <view class="inline-box" style="border:0;padding: 10rpx 10rpx;">
+            <button class="pub-btn" @tap.stop="publish">发 布</button>
         </view>
     </view>
 </template>
@@ -50,41 +156,142 @@ import wepy from "wepy";
 
 export default class Publish extends wepy.page {
   config = {
-    navigationBarTitleText: "发布"
+    navigationBarTitleText: "发布行程"
+  };
+  selfData = {
+    regionExp: /县|行政|自治|直辖|盟/
   };
   data = {
-    array: ["美国", "中国", "巴西", "日本"],
-    index: 0,
-    goDate: "2016-09-01",
-    backDate: "2018-06-22",
-    time: "12:01",
-    region: "北京",
-    icon: ""
-  };
-
-  methods = {
-    bindPickerChange(e) {
-      console.log("picker发送选择改变，携带值为", e.detail.value);
-      this.index = e.detail.value;
+    hideAddBtn: false,
+    peopleRange: [
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23,
+      24,
+      25
+    ],
+    peopleKey: 0,
+    startRegionShow: "请选择",
+    startRegion: [],
+    endRegionShow: [],
+    endRegion: [],
+    startTime: "请选择",
+    endTime: "请选择",
+    people: "请选择",
+    otherDesc: "",
+    startTimeRange: {
+      start: "",
+      end: ""
     },
-    bindGoDateChange(e) {
-      console.log("picker发送选择改变，携带值为", e.detail.value);
-      this.goDate = e.detail.value;
-    },
-    bindBackDateChange(e) {
-      console.log("picker发送选择改变，携带值为", e.detail.value);
-      this.backDate = e.detail.value;
-    },
-    bindTimeChange(e) {
-      console.log("picker发送选择改变，携带值为", e.detail.value);
-      this.time = e.detail.value;
-    },
-    bindRegionChange(e) {
-      this.region = e.detail.value.join("-");
+    endTimeRange: {
+      start: "",
+      end: ""
     }
   };
+  methods = {
+    selectStartLocation(e) {
+      const { value } = e.detail;
+      this.startRegion = value;
+      if (this.selfData.regionExp.test(value[1]) || value[0] === value[1]) {
+        this.startRegionShow = `${value[0]}-${value[2]}`;
+      } else {
+        this.startRegionShow = `${value[0]}-${value[1]}`;
+      }
+    },
+    selectEndLocation(e) {
+      const { value } = e.detail;
+      let thisRegion;
+      this.endRegion = value;
+      if (this.selfData.regionExp.test(value[1]) || value[0] === value[1]) {
+        thisRegion = `${value[0]}-${value[2]}`;
+      } else {
+        thisRegion = `${value[0]}-${value[1]}`;
+      }
+      if (this.endRegionShow.indexOf(thisRegion) === -1) {
+        this.endRegionShow = [...this.endRegionShow, thisRegion];
+      }
+      if (this.endRegionShow.length === 5) {
+        this.hideAddBtn = true;
+      }
+    },
+    removeEndRegion(e) {
+      const { index } = e.currentTarget.dataset;
+      this.endRegionShow = [
+        ...this.endRegionShow.slice(0, index),
+        ...this.endRegionShow.slice(index + 1)
+      ];
+      if (this.endRegionShow.length !== 5) {
+        this.hideAddBtn = false;
+      }
+    },
+    selectStartTime(e) {
+      this.startTime = e.detail.value;
+      this.endTimeRange.start = this.getOtherDay(this.startTime, "next");
+    },
+    selectEndTime(e) {
+      this.endTime = e.detail.value;
+      this.startTimeRange.end = this.getOtherDay(this.endTime, "prev");
+    },
+    selectPeople(e) {
+      this.peopleKey = e.detail.value;
+      this.people = this.peopleRange[+this.peopleKey];
+    },
+    confirmDesc(e) {
+      this.otherDesc = e.detail.value.replace(/党|sb/gi, "");
+    },
+    publish() {
+      //参数校验
+      wx.showLoading({
+        title: "发布中",
+        mask: true
+      });
+    }
+  };
+  getOtherDay(time, flag) {
+    let timer = new Date(`${time} 00:00:00`).getTime();
+    if (flag === "next") {
+      timer += 86400000;
+    } else if (flag === "prev") {
+      timer -= 86400000;
+    } else {
+      timer = new Date().getTime();
+    }
+    const nextTimer = new Date(timer);
+    let year = nextTimer.getFullYear();
+    let month = nextTimer.getMonth() + 1;
+    let day = nextTimer.getDate();
+    month = month > 9 ? month : "0" + month;
+    day = day > 9 ? day : "0" + day;
+    return `${year}-${month}-${day}`;
+  }
+  initTime() {
+    this.startTimeRange.start = this.getOtherDay();
+    this.endTimeRange.start = this.getOtherDay(
+      this.startTimeRange.start,
+      "next"
+    );
+  }
   onLoad() {
-    this.icon = require("../images/base64.js").icon20;
+    this.initTime();
   }
 }
 </script>

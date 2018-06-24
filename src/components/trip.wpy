@@ -1,26 +1,24 @@
 <style lang="less" scoped>
     @gray_font_333: #333;
     @gray_font_666: #666;
+    @gray_font_999: #999;
     .trip{
         width: 100%;
-        padding: 10rpx 10rpx;
+        padding: 18rpx 30rpx;
         background-color: #fff;
         margin-bottom: 5rpx;
         .trip_header{
             display: flex;
             justify-content: space-between;
             align-items: center;
-            color: @gray_font_666;
-            font-size: 32rpx;
-            > text{
-                font-size: 30rpx;
-            }
+            color: @gray_font_999;
+            font-size: 28rpx;
             .trip_header_user{
                 display: flex;
                 align-items: center;
                 image{
-                    width: 50rpx;
-                    height: 50rpx;
+                    width: 46rpx;
+                    height: 46rpx;
                     border-radius: 50%;
                     border: 1px solid #ddd;
                     margin-right: 15rpx;
@@ -31,7 +29,7 @@
             color: @gray_font_333;
             padding: 15rpx 0 15rpx 64rpx;
             display: flex;
-            font-size: 34rpx;
+            font-size: 30rpx;
             > text{
                 flex: 0 0 auto;
             }
@@ -43,9 +41,10 @@
             .location_item{
                 flex: 0 0 auto;
                 border: 1px solid #ddd;
-                padding: 2rpx 8rpx;
+                padding: 0rpx 10rpx;
                 margin-left: 20rpx;
                 margin-bottom: 10rpx;
+                border-radius: 6rpx;
             }
         }
         .trip_time{
