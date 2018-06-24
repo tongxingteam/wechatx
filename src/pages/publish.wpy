@@ -150,6 +150,7 @@
 </template>
 <script>
     import wepy from 'wepy';
+    import HttpService from '../util';
 
     export default class Publish extends wepy.page {
         config = {
@@ -180,6 +181,7 @@
             },
         }
         methods = {
+            // 出发地被选择
             selectStartLocation(e){
                 const { value } = e.detail;
                 this.startRegion = value;
@@ -189,6 +191,7 @@
                     this.startRegionShow = `${value[0]}-${value[1]}`;
                 }
             },
+            // 目的地被选择
             selectEndLocation(e){
                 const { value } = e.detail;
                 let thisRegion;
@@ -205,6 +208,7 @@
                     this.hideAddBtn = true;
                 }
             },
+            // 移出已选择的触发地
             removeEndRegion(e){
                 const { index } = e.currentTarget.dataset;
                 this.endRegionShow = [...this.endRegionShow.slice(0,index), ...this.endRegionShow.slice(index+1)];
@@ -212,29 +216,107 @@
                     this.hideAddBtn = false;
                 }
             },
+            // 触发时间被选择
             selectStartTime(e){
                 this.startTime = e.detail.value;
                 this.endTimeRange.start = this.getOtherDay(this.startTime, 'next');
             },
+            // 结束时间被选择
             selectEndTime(e){
                 this.endTime = e.detail.value;
                 this.startTimeRange.end = this.getOtherDay(this.endTime, 'prev');
             },
+            // 参团人数被选择
             selectPeople(e){
                 this.peopleKey = e.detail.value;
                 this.people = this.peopleRange[+this.peopleKey];
             },
+            // 确认说明
             confirmDesc(e){
                 this.otherDesc = e.detail.value.replace(/党|sb/ig, '');
             },
             publish(){
                 //参数校验
+                const formData = this.checkForm();
+                if(checkForm === false) return;
                 wx.showLoading({
                     title: '发布中',
                     mask: true
                 });
+                this.pushTrip(formData, ()=>{
+                    this.hideLoading();
+                });
             }
         }
+        // 检查数据合法性
+        checkForm(){
+            const formData = Object.create(null);
+            let msg = '';
+            if(this.startRegionShow === '请选择'){
+                msg = '请选择出发地';
+            }else if(this.endRegionShow.length === 0){
+                msg = '请选择目的地';
+            }else if(this.startTime === '请选择'){
+                msg = '请选择出发日期';
+            }else if(this.endTime === '请选择'){
+                msg = '请选择返回日期';
+            }else if(this.people === '请选择'){
+                msg = '请选择参团的人数';
+            }
+            if(msg.length === 0){
+                this.showMsg(msg);
+                return false;
+            }else{
+                formData.trip_start_location = this.startRegionShow;
+                formData.trip_end_location = JSON.stringify(this.endRegionShow);
+                formData.trip_start_time = this.startTime;
+                formData.trip_end_time = this.endTime;
+                formData.trip_merber_count = this.people;
+                formData.trip_other_desc = this.otherDesc;
+                formData.trip_publish_user_id = this.$parent.globalData.userInfo.uid;
+                return formData;
+            }
+        }
+        pushTrip(data, callback){
+            HttpService.Post({
+                urlName: 'publishTrip',
+                data: data,
+                page: 'trip_publish',
+                success: (code, data, msg) => {
+                    if(code === 20000){
+                        wx.showToast({
+                            title: '发布成功',
+                            icon: 'success',
+                            mask: true,
+                            complete: () => {
+
+                            }
+                        });
+                    }else{
+                        wx.showToast({
+                            title: '发布失败',
+                            icon: 'none',
+                            mask: true
+                        });
+                    }
+                },
+                fail: (msg) => {
+
+                },
+                complete: () => {
+                    callback && callback();
+                }
+            });
+        }
+        // 提示框
+        showMsg(msg){
+            wx.showModal({
+                title: '同行',
+                content: msg,
+                mask: true
+            });
+        }
+        // 获取指定日期
         getOtherDay(time, flag){
             let timer = new Date(`${time} 00:00:00`).getTime();
             if(flag === 'next'){
@@ -252,10 +334,12 @@
             day = day > 9 ? day : '0' + day;
             return `${year}-${month}-${day}`;
         }
+        // 初始化日期范围
         initTime(){
             this.startTimeRange.start = this.getOtherDay();
             this.endTimeRange.start = this.getOtherDay(this.startTimeRange.start, 'next');
         }
+        // 组件加载完成
         onLoad(){
             this.initTime();
         }
