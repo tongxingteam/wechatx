@@ -21,9 +21,11 @@ import 'wepy-async-function'
 export default class extends wepy.app {
   config = {
     pages: [
-      // 'pages/publish', // 发布
+        'pages/publish', // 发布
         'pages/index', // 首页
         'pages/publish', // 发布
+        'pages/index', // 首页
+        // 'pages/publish', // 发布
         'pages/trip', // 行程详情
         'pages/message', // 消息
         'pages/user', // 个人主页
@@ -70,7 +72,10 @@ export default class extends wepy.app {
   }
 
   globalData = {
-    userInfo: null
+    // userInfo: null
+    userInfo: {
+      uid: 'a019406067d511e89c437132ae595195'
+    }
   }
 
   constructor() {
