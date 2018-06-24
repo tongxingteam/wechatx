@@ -122,7 +122,8 @@
 
   export default class Index extends wepy.page {
     config = {
-      navigationBarTitleText: '与我同行'
+      navigationBarTitleText: '与我同行',
+      enablePullDownRefresh: true,
     }
     components = {
         Trip
