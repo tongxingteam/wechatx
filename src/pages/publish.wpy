@@ -1,4 +1,4 @@
-<style lang="less">
+<style lang="less" scoped>
 .inline-box {
   padding: 20rpx 20rpx;
   width: 100%;
@@ -20,22 +20,12 @@
   }
   .input-value {
     color: #999;
-    .add-region {
-      width: 100%;
-      height: 45rpx;
-      color: #333;
-      text-align: center;
-      line-height: 40rpx;
-      font-size: 36rpx;
-      color: rgba(18, 199, 211, 1);
-      background-color: rgba(248, 248, 248, 1);
-      border-radius: 8rpx;
-    }
     .end-location {
       display: flex;
       justify-content: flex-start;
       align-items: center;
       flex-wrap: wrap;
+      padding-left: 15rpx;
       > view {
         flex: 0 0 auto;
         border: 1px solid #ddd;
@@ -44,6 +34,15 @@
         margin-bottom: 10rpx;
         border-radius: 6rpx;
       }
+    .add-region {
+        color: rgba(18, 199, 211, 1);
+        background-color: rgba(248, 248, 248, 1);
+        margin-right: 0rpx;
+        margin-top: -10rpx;
+        font-size: 30rpx;
+        padding: 5rpx 10rpx;
+        border-radius: 6rpx;
+    }
     }
     .desc-textarea {
       font-size: 30rpx;
@@ -65,17 +64,22 @@
   width: 100%;
   background-color: rgba(18, 199, 211, 1);
   color: #fff;
-  border-radius: 8rpx;
+  border-radius: 0rpx;
   &:active {
     background-color: rgb(20, 176, 187, 1);
   }
+}
+.icon{
+    font-size: 45rpx;
+    margin-right: 20rpx;
+    color: rgb(20, 176, 187, 1);
 }
 </style>
 <template>
     <view class="container">
         <view class="inline-box">
             <view class="input-title">
-                <image src="https://ss2.bdstatic.com/70cFvnSh_Q1YnxGkpoWK1HF6hhy/it/u=1134797552,1476775404&fm=27&gp=0.jpg"></image>
+                <i class="iconfont tx-biaoji icon" style="margin-right: 12rpx;"></i>
                 <text>出发地</text>
             </view>
             <view class="input-value">
@@ -87,7 +91,7 @@
         </view>
         <view class="inline-box" style="padding-bottom: 0;">
             <view class="input-title" style="width: 100%;">
-                <image src="https://ss2.bdstatic.com/70cFvnSh_Q1YnxGkpoWK1HF6hhy/it/u=1134797552,1476775404&fm=27&gp=0.jpg"></image>
+                <i class="iconfont tx-biaoji icon" style="margin-right: 12rpx;"></i>
                 <text>目的地</text>
             </view>
             <view class="input-value" style="width: 100%;padding: 10rpx 45rpx;">
@@ -95,15 +99,15 @@
                     <repeat for="{{endRegionShow}}" key="item">
                         <view @tap.stop="removeEndRegion" data-index="{{index}}">{{item}}</view>
                     </repeat>    
+                    <picker mode="region" @change="selectEndLocation" value="{{endRegion}}">    
+                        <view class="iconfont tx-jia icon add-region" hidden="{{hideAddBtn}}"></view>
+                    </picker>
                 </view>
-                <picker mode="region" @change="selectEndLocation" value="{{endRegion}}">    
-                    <view class="add-region" hidden="{{hideAddBtn}}">+</view>
-                </picker>
             </view>
         </view>
         <view class="inline-box">
             <view class="input-title">
-                <image src="https://ss2.bdstatic.com/70cFvnSh_Q1YnxGkpoWK1HF6hhy/it/u=1134797552,1476775404&fm=27&gp=0.jpg"></image>
+                <i class="iconfont tx-riqi icon" style="font-size: 35rpx;"></i>
                 <text>出发日期</text>
             </view>
             <view class="input-value">
@@ -115,7 +119,7 @@
         </view>
         <view class="inline-box">
             <view class="input-title">
-                <image src="https://ss2.bdstatic.com/70cFvnSh_Q1YnxGkpoWK1HF6hhy/it/u=1134797552,1476775404&fm=27&gp=0.jpg"></image>
+                <i class="iconfont tx-riqi icon" style="font-size: 35rpx;"></i>
                 <text>返回日期</text>
             </view>
             <view class="input-value">
@@ -127,7 +131,7 @@
         </view>
         <view class="inline-box">
             <view class="input-title">
-                <image src="https://ss2.bdstatic.com/70cFvnSh_Q1YnxGkpoWK1HF6hhy/it/u=1134797552,1476775404&fm=27&gp=0.jpg"></image>
+                <i class="iconfont tx-11 icon" style="margin-right:0;"></i>
                 <text>参团人数</text>
             </view>
             <view class="input-value">
@@ -139,7 +143,7 @@
         </view>
         <view class="inline-box">
             <view class="input-title">
-                <image src="https://ss2.bdstatic.com/70cFvnSh_Q1YnxGkpoWK1HF6hhy/it/u=1134797552,1476775404&fm=27&gp=0.jpg"></image>
+                <i class="iconfont tx-description icon" style="margin-right: 10rpx;"></i>
                 <text>行程说明</text>
             </view>
             <view class="input-value" style="width: 100%;padding: 10rpx 45rpx;">
@@ -160,7 +164,8 @@
             navigationBarTitleText: '发布行程'
         }
         selfData = {
-            regionExp: /县|行政|自治|直辖|盟/
+            regionExp: /县|行政|自治|直辖|盟/,
+            originData: null
         }
         data = {
             hideAddBtn: false,
@@ -241,19 +246,19 @@
             publish(){
                 //参数校验
                 const formData = this.checkForm();
-                if(checkForm === false) return;
+                if(formData === false) return;
                 wx.showLoading({
                     title: '发布中',
                     mask: true
                 });
                 this.pushTrip(formData, ()=>{
-                    this.hideLoading();
+                    wx.hideLoading();
                 });
             }
         }
         // 检查数据合法性
         checkForm(){
-            const formData = Object.create(null);
+            const formData = {};
             let msg = '';
             if(this.startRegionShow === '请选择'){
                 msg = '请选择出发地';
@@ -266,7 +271,7 @@
             }else if(this.people === '请选择'){
                 msg = '请选择参团的人数';
             }
-            if(msg.length === 0){
+            if(msg.length !== 0){
                 this.showMsg(msg);
                 return false;
             }else{
@@ -280,11 +285,11 @@
                 return formData;
             }
         }
+        // 发送数据
         pushTrip(data, callback){
             HttpService.Post({
                 urlName: 'publishTrip',
                 data: data,
-                page: 'trip_publish',
                 success: (code, data, msg) => {
                     if(code === 20000){
                         wx.showToast({
@@ -292,7 +297,8 @@
                             icon: 'success',
                             mask: true,
                             complete: () => {
-
+                                this.resetForm();
+                                this.$apply();
                             }
                         });
                     }else{
@@ -304,7 +310,11 @@
                     }
                 },
                 fail: (msg) => {
-
+                    wx.showToast({
+                        title: '发布失败',
+                        icon: 'none',
+                        mask: true
+                    });
                 },
                 complete: () => {
                     callback && callback();
@@ -313,11 +323,24 @@
         }
         // 提示框
         showMsg(msg){
-            wx.showModal({
-                title: '同行',
-                content: msg,
-                mask: true
+            wx.showToast({
+                title: msg,
+                icon: 'none'
             });
+        }
+        // 重置表单
+        resetForm(){
+            this.hideAddBtn = false;
+            this.peopleKey = 0;
+            this.startRegionShow = '请选择';
+            this.startRegion = [];
+            this.endRegionShow = [];
+            this.endRegin = [];
+            this.startTime = '请选择';
+            this.endTime = '请选择';
+            this.people = '请选择';
+            this.otherDesc = '';
+            this.initTime();
         }
         // 获取指定日期
         getOtherDay(time, flag){
@@ -341,9 +364,12 @@
         initTime(){
             this.startTimeRange.start = this.getOtherDay();
             this.endTimeRange.start = this.getOtherDay(this.startTimeRange.start, 'next');
+            this.startTimeRange.end = '';
+            this.endTimeRange.end = '';
         }
         // 组件加载完成
         onLoad(){
+            this.selfData.originData = JSON.stringify(this.$data);
             this.initTime();
         }
     }

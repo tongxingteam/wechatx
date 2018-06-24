@@ -223,6 +223,15 @@ export default class Trip extends wepy.page {
       console.log('申请参团！')
     }
   };
+  // 上滑显示提示
+  upperControl = {
+    show: msg => {
+      this.upperMsg = msg;
+    },
+    hide: () => {
+      this.upperMsg = "";
+    }
+  };
   requestTripDetail(callback) {
     HttpService.Post({
       urlName: "queryTripDetail",
@@ -240,25 +249,16 @@ export default class Trip extends wepy.page {
           
           this.$apply();
         } else {
-          /* 查询记录失败 */
-          if (pageNo === 1) {
-            this.upperControl.show("这里好像有bug");
-          } else {
-            this.upperControl.show("加载失败");
-          }
+          this.upperControl.show("加载失败");
           this.$apply();
         }
       },
       fail: msg => {
         wx.showToast({
-          title: "失败",
+          title: msg,
           icon: "none"
         });
-        if (pageNo === 1) {
-          this.upperControl.show("这里好像有bug");
-        } else {
-          this.upperControl.show("加载失败");
-        }
+        this.upperControl.show("加载失败");
         this.$apply();
       },
       complete: () => {

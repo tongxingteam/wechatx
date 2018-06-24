@@ -21,16 +21,16 @@ import 'wepy-async-function'
 export default class extends wepy.app {
   config = {
     pages: [
+        'pages/apply_list', //申请列表页
         'pages/trip', // 行程详情
-        // 'pages/publish', // 发布
         'pages/index', // 首页
-        'pages/publish', // 发布
+        // 'pages/publish', // 发布
         // 'pages/trip', // 行程详情
-        'pages/user', // 个人主页
         'pages/message', // 消息
+        'pages/user', // 个人主页
         'pages/discovery', // 发现
         'pages/my', // 我的
-        'pages/apply_list' //申请列表页
+        // 'pages/apply_list' //申请列表页
     ],
     window: {
       backgroundTextStyle: 'light',
@@ -71,7 +71,10 @@ export default class extends wepy.app {
   }
 
   globalData = {
-    userInfo: null
+    // userInfo: null
+    userInfo: {
+      uid: 'a019406067d511e89c437132ae595195'
+    }
   }
 
   constructor() {

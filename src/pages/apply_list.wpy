@@ -19,10 +19,10 @@
     }
     .user-name {
       margin-left: 10rpx;
-      margin-right: 20rpx; 
+      margin-right: 20rpx;
     }
     .apply-time {
-      color: #BBBBBB;
+      color: #bbbbbb;
       font-size: 24rpx;
     }
   }
@@ -56,20 +56,20 @@
       <repeat for="{{apply_list}}">
         <view class="apply-item" data-index="{{index}}">
           <view class="item-lf">
-            <image src="{{item.user_avatar}}"/>
-            <view class="user-name">{{item.user_name}}</view>
-            <view class="apply-time">{{item.apply_time}}</view>
+            <image src="{{item.apply_user_info.user_wx_portriat}}"/>
+            <view class="user-name">{{item.apply_user_info.user_wx_name}}</view>
+            <view class="apply-time">{{item.apply_create_time}}</view>
           </view>
-          <view wx:if="{{item.states === 0}}" class="item-rt">
+          <view wx:if="{{item.apply_status_to_add === 0}}" class="item-rt">
             <button class="handle-btn" @tap.stop="agreeApply">同意</button>
             <button class="handle-btn" @tap.stop="refuseApply">拒绝</button>
           </view>
-          <view wx:elif="{{item.states === 1}}" class="item-rt">
+          <view wx:elif="{{item.apply_status_to_add === 1}}" class="item-rt">
             <view class="apply">
               已同意
             </view>
           </view>
-          <view wx:else="{{item.states === -1}}" class="item-rt">
+          <view wx:else="{{item.apply_status_to_add === 2}}" class="item-rt">
             <view class="refuse">
               已拒绝
             </view>
@@ -80,6 +80,7 @@
 </template>
 <script>
 import wepy from "wepy";
+import HttpService from "../util";
 
 export default class My extends wepy.page {
   config = {
@@ -88,22 +89,37 @@ export default class My extends wepy.page {
   data = {
     apply_list: [
       {
-        user_name: "里斯本",
-        user_avatar: "../images/icon_nav_search.png",
-        apply_time: "5分钟前",
-        states: 0,
+        apply_trip_id: "123456",
+        apply_user_id: "申请人id",
+        apply_user_info: {
+          user_id: "用户id",
+          user_wx_name: "昵称",
+          user_wx_portriat: "头像"
+        },
+        apply_status_to_add: 0,
+        apply_create_time: "申请日期"
       },
       {
-        user_name: "赵四",
-        user_avatar: "../images/icon_tabbar.png",
-        apply_time: "2小时前",
-        states: 1
+        apply_trip_id: "123456",
+        apply_user_id: "申请人id",
+        apply_user_info: {
+          user_id: "用户id",
+          user_wx_name: "昵称",
+          user_wx_portriat: "头像"
+        },
+        apply_status_to_add: 1,
+        apply_create_time: "申请日期"
       },
       {
-        user_name: "李四",
-        user_avatar: "../images/icon_tabbar.png",
-        apply_time: "3小时前",
-        states: -1
+        apply_trip_id: "123456",
+        apply_user_id: "申请人id",
+        apply_user_info: {
+          user_id: "用户id",
+          user_wx_name: "昵称",
+          user_wx_portriat: "头像"
+        },
+        apply_status_to_add: 2,
+        apply_create_time: "申请日期"
       }
     ]
   };
@@ -115,6 +131,43 @@ export default class My extends wepy.page {
       console.log("处理拒绝申请！");
     }
   };
+  getTripApplyList(callback) {
+    HttpService.Post({
+      urlName: "queryTripApplyList",
+      data: {
+        trip_id: "5cbe08506b0011e8a53a53d3bea89acf"
+        // user_id: "b019406067d511e89c437132ae595195",
+      },
+      success: (code, data, msg) => {
+        console.log(code);
+        /* 查询记录成功 */
+        if (code === 20000) {
+          console.log(data);
+          // const { count, list } = data;
+
+          this.$apply();
+        } else {
+          this.upperControl.show("加载失败");
+          this.$apply();
+        }
+      },
+      fail: msg => {
+        wx.showToast({
+          title: msg,
+          icon: "none"
+        });
+        this.upperControl.show("加载失败");
+        this.$apply();
+      },
+      complete: () => {
+        callback && callback();
+        console.log("请求完成");
+      }
+    });
+  }
+  onLoad() {
+    this.getTripApplyList();
+  }
 }
 </script>
 
