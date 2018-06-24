@@ -1,5 +1,6 @@
 <style lang="less">
 @import './style/weui.less';
+@import './style/icon.less';
 view{
   box-sizing: border-box;
 }

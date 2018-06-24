@@ -3,11 +3,12 @@
 </style>
 <template>
     <view>
-        个人主页
+        个人主页 <i class="iconfont tx-tongxingicon"></i>
     </view>
 </template>
 <script>
-    import wepy from 'wepy';
+    import wepy from 'wepy'
+
 
     export default class User extends wepy.page {
         onLoad (option) {
