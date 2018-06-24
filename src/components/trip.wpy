@@ -49,10 +49,15 @@
         }
         .trip_time{
             margin-top: -15rpx;
+            position: relative;
             .trip_time-value{
                 display: inline-block;
                 margin-left: 20rpx;
             }   
+        }
+        .trip_status{
+            position: absolute;
+            right :0rpx;
         }
     }
 </style>
@@ -79,14 +84,16 @@
             <view class="trip_time">
                 <text>时间:</text>
                 <text class="trip_time-value">{{startTime + '~' + endTime}}</text>
+                <text class='trip_status' wx:if="{{sponsorStart == 0}}">申请中</text>
+                <text class='trip_status' wx:elif="{{sponsorStart == 1}}">已参团</text>
+                <text class='trip_status' wx:elif="{{sponsorStart == 2}}">已拒绝</text>
+                <text class='trip_status' wx:elif="{{sponsorStart == 3}}">已退出</text>
             </view>
         </view>
     </navigator>  
 </template>
 <script>
     import wepy from 'wepy';
-    
-    import HttpService from '../util';
 
     export default class Trip extends wepy.component {
         props = {
@@ -97,10 +104,8 @@
             createTime: String, //创建时间
             location: Array, //目的地
             startTime: String, //开始时间
-            endTime: String //结束时间
-        };
-        methods = {
-            goToUser () {}
+            endTime: String, //结束时间
+            sponsorStart:String,//发起状态
         };
     }
 </script>

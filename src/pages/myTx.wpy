@@ -1,0 +1,213 @@
+<style lang="less">
+  .container{
+    position: relative;
+  }
+  view {
+    box-sizing: border-box;
+  }
+  .index-swiper {
+    width: 100%;
+    height: 150px;
+    position: relative;
+    box-sizing: border-box;
+  }
+  .trip-list{
+    box-sizing: border-box;
+    background-color: #ddd;
+    width: 100%;
+  }
+  .banner{
+    width: 100%;
+    height: 350rpx;
+    image{
+      width: 100%;
+    }
+  }
+  .upper_tip{
+    width: 100%;
+    height: 30px;
+    line-height: 30px;
+    text-align: center;
+    background-color: transparent;
+    color: #ddd;
+    font-size: 30rpx;
+  }
+  .pub-btn{
+    position: fixed;
+    bottom: 100rpx;
+    right: 30rpx;
+    width: 90rpx;
+    height: 90rpx;
+    line-height: 90rpx;
+    text-align: center;
+    border-radius: 50%;
+    border: 1px solid rgba(18, 199, 211, .8);
+    background-color: rgba(18, 199, 211, .8);
+    color: rgba(248, 248, 248, 1);
+    font-size: 30rpx;
+    box-shadow: 0 0 10rpx rgba(0,0,0,.8);
+    &:active{
+      background-color: rgba(18, 199, 211, 1);
+    }
+  }
+</style>
+<template>
+  <view class="container">
+    <scroll-view scroll-y style="height: {{viewHeight+'px'}}" lower-threshold="30" bindscrolltolower="loadMoreTrip">
+      <view class="trip-list">
+        <repeat for="{{tripList}}" key="key">
+          <Trip 
+            :userId="item.publish_user_id"
+            :userName="item.publish_user_wx_name"
+            :userImg="item.publish_user_wx_portriat"
+            :createTime="item.trip_create_time"
+            :location="item.trip_end_location"
+            :startTime="item.trip_start_time"
+            :endTime="item.trip_end_time"
+            :tripId="item.trip_id"
+          />
+        </repeat>
+      </view>
+      <view class="upper_tip">
+        <text>{{upperMsg}}</text>
+      </view>
+    </scroll-view>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import Trip from '../components/trip'
+  import HttpService from '../util';
+
+  export default class Index extends wepy.page {
+    config = {
+      navigationBarTitleText: '我的同行'
+    }
+    components = {
+        Trip
+    }
+    selfData = {
+      keyword: '',
+      pageNo: 1, // 当前页
+      pageSize: 10, // 每页的数量
+      count: 35, // 总数据量
+      done: false, // 是否加载完全部数据
+      pending: false // 是否正在请求分页数据
+    }
+    data = {
+      canIUse: wepy.canIUse('button.open-type.getUserInfo'),
+      tripList: [], // 行程列表数据
+      viewHeight: 500, //信息展示窗口的高度
+      upperMsg: ''
+    }
+    // 上滑显示提示
+    upperControl = {
+      show: (msg) => {
+        this.upperMsg = msg;
+      },
+      hide: () => {
+        this.upperMsg = '';
+      }
+    }
+    methods = {
+      // 加载更多行程信息
+      loadMoreTrip(){
+        if(this.selfData.pending === false && this.selfData.done === false){
+          this.selfData.pending = true;
+          this.selfData.pageNo++;
+          this.requestTripList(
+            this.selfData.keyword, 
+            this.selfData.pageNo, 
+            this.selfData.pageSize, 
+            () => {
+              this.selfData.pending = false;
+            }
+          );
+        }
+      },
+    }
+    // 请求行程数据
+    requestTripList(keyword = '', pageNo = 1, pageSize = 10, callback){
+      HttpService.Post({
+            urlName: 'queryTripListByWord',
+            data: {
+                keyword,
+                pageNo,
+                pageSize
+            },
+            success: (code, data, msg) => {
+              /* 查询记录成功 */
+              if(code === 20000){
+                const { count, list } = data;
+                this.selfData.count = count;
+                if(count === 0){
+                  // 暂无数据
+                  this.upperControl.show(`没有搜索到"${keyword}"相关的行程`);
+                }else{
+                  if(pageNo === 1){
+                    // 新查询
+                    this.tripList = list;
+                    this.upperControl.show('加载中...');
+                  }else{
+                    // 后续的分页查询
+                    this.tripList = [...this.tripList, ...list];
+                  }
+                  if(pageNo * pageSize >= this.selfData.count){
+                    this.selfData.done = true;
+                    this.upperControl.show('--- 这是我的底线了 ---');
+                  }else{
+                    this.selfData.done = false;
+                  }
+                }
+                this.$apply();
+              }else{
+              /* 查询记录失败 */
+                if(pageNo === 1){
+                  this.upperControl.show('这里好像有bug');
+                }else{
+                  this.upperControl.show('加载失败');
+                }
+                this.$apply();
+              }
+            },
+            fail: (msg) => {
+                wx.showToast({
+                    title: '失败',
+                    icon: 'none'
+                });
+                if(pageNo === 1){
+                  this.upperControl.show('这里好像有bug');
+                }else{
+                  this.upperControl.show('加载失败');
+                }
+                this.$apply();
+            },
+            complete: () => {
+              callback && callback();
+              console.log('请求完成');
+            }
+      });
+    }
+    onLoad() {
+      this.$parent.pageSign()
+      // 初始化视图高度
+      this.viewHeight = wx.getSystemInfoSync().windowHeight;
+      // 初始化数据请求
+      const { keyword, pageNo, pageSize } = this.selfData;
+      this.requestTripList(
+        keyword, 
+        pageNo, 
+        pageSize, 
+        () => {
+          this.selfData.pending = false;
+        }
+      );
+
+      // this.$parent.getUserInfo((data) => {
+      //   this.userInfo = data
+      //   this.$apply()
+      // });
+    }
+  }
+</script>
