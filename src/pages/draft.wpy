@@ -16,11 +16,32 @@
     components = {
         Trip
     };
+    selfData = {
+      keyword: '',
+      pageNo: 1, // 当前页
+      pageSize: 10, // 每页的数量
+      count: 35, // 总数据量
+      done: false, // 是否加载完全部数据
+      pending: false // 是否正在请求分页数据
+    };
     data = {
          tripList: [], // 行程列表数据
     };
+    onLoad () {
+        // 初始化数据请求
+      const { keyword, pageNo, pageSize } = this.selfData;
+      this.requestTripList(
+        keyword, 
+        pageNo, 
+        pageSize, 
+        () => {
+          this.selfData.pending = false;
+        }
+      );
+    };
     methods = {
-        //请求行程数据
+    };    
+    //请求行程数据
     requestTripList(keyword = '', pageNo = 1, pageSize = 10, callback){
       HttpService.Post({
             urlName: 'queryTripListByWord',
@@ -33,6 +54,23 @@
               /* 查询记录成功 */
               if(code === 20000){
                 console.log(data)
+                const { count, list } = data;
+                this.selfData.count = count;
+                if(count === 0){
+                  // 暂无数据
+                  this.upperControl.show(`没有搜索到"${keyword}"相关的行程`);
+                }else{
+                  if(pageNo === 1){
+                    // 新查询
+                    this.tripList = list;
+                    //this.upperControl.show('加载中...');
+                  }else{
+                    // 后续的分页查询
+                    this.tripList = [...this.tripList, ...list];
+                  }
+                  
+                }
+                this.$apply();
               }
             },
             fail: (msg) => {
@@ -45,7 +83,6 @@
         })
       
       }
-    }
   }
 </script>
 <style lang="less">
