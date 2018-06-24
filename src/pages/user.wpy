@@ -77,9 +77,7 @@
     }
   }
   .navbar {
-    .page {
-      margin-top: 20rpm;
-    }
+    .page,
     .page__bd {
       height: 100%;
     }
