@@ -57,15 +57,15 @@
       <view class="trip-list">
         <repeat for="{{tripList}}" key="key">
           <Trip 
-            :userId="item.userId"
-            :userName="item.userName"
-            :userImg="item.userImg"
-            :createTime="item.createTime"
-            :location="item.location"
-            :startTime="item.startTime"
-            :endTime="item.endTime"
-            :tripId="item.tripId"
-            />
+            :userId="item.publish_user_id"
+            :userName="item.publish_user_wx_name"
+            :userImg="item.publish_user_wx_portriat"
+            :createTime="item.trip_create_time"
+            :location="item.trip_end_location"
+            :startTime="item.trip_start_time"
+            :endTime="item.trip_end_time"
+            :tripId="item.trip_id"
+          />
         </repeat>
       </view>
       <view class="upper_tip">
