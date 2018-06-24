@@ -22,9 +22,6 @@ import HttpService from './util'
 export default class extends wepy.app {
   config = {
     pages: [
-        // 'pages/publish', // 发布
-        // 'pages/mySponsor',
-        // 'pages/applicationRecord',
         'pages/myTx',//我的同行
         'pages/index', // 首页
         'pages/publish', // 发布
@@ -36,9 +33,9 @@ export default class extends wepy.app {
         'pages/discovery', // 发现
         'pages/my', // 我的
         'pages/apply_list', //申请列表页
-        // 'pages/applicationRecord',//申请记录
-        // 'pages/mySponsor',//我的发起
-        // 'pages/myTx',//我的同行
+        'pages/applicationRecord',//申请记录
+        'pages/mySponsor',//我的发起
+        'pages/myTx',//我的同行
         'pages/draft',//我的草稿列表页
         'pages/draft_item'//我的草稿详情页
     ],
