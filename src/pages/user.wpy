@@ -108,7 +108,7 @@
           </view>
           <view class="weui-tab__panel">
             <view class="weui-tab__content" hidden="{{activeIndex != 0}}">
-              <scroll-view scroll-y style="height: {{viewHeight+'px'}}" lower-threshold="30" bindscrolltolower="loadMoreTrip">
+              <scroll-view id="sview" scroll-y style="height: {{viewHeight+'px'}};overflow:hidden;" lower-threshold="1" bindscrolltolower="loadMoreTrip">
                 <view class="trip-list">
                   <repeat for="{{tripList}}" key="key">
                     <Trip :userId="item.userId" :userName="item.userName" :userImg="item.userImg" :createTime="item.createTime" :location="item.location" :startTime="item.startTime" :endTime="item.endTime" :tripId="item.tripId" />
@@ -139,8 +139,8 @@
     config = {
       navigationBarTitleText: '与我同行',
     }
-        components = {
-        Trip
+    components = {
+      Trip
     }
     selfData = {
       keyword: '',
@@ -165,15 +165,14 @@
         this.sliderOffset = e.currentTarget.offsetLeft;
         this.activeIndex = e.currentTarget.id;
       },
-
-       loadMoreTrip(){
-        if(this.selfData.pending === false && this.selfData.done === false){
+      loadMoreTrip() {
+        if (this.selfData.pending === false && this.selfData.done === false) {
           this.selfData.pending = true;
           this.selfData.pageNo++;
           this.requestTripList(
-            this.selfData.keyword, 
-            this.selfData.pageNo, 
-            this.selfData.pageSize, 
+            this.selfData.keyword,
+            this.selfData.pageNo,
+            this.selfData.pageSize,
             () => {
               this.selfData.pending = false;
             }
@@ -189,7 +188,6 @@
         this.upperMsg = '';
       }
     }
-    
     // 请求行程数据
     requestTripList(keyword = '', pageNo = 1, pageSize = 10, callback) {
       HttpService.Post({
@@ -257,16 +255,21 @@
     }
     async onLoad() {
       let res = wx.getSystemInfoSync();
-      this.viewHeight = wx.getSystemInfoSync().windowHeight;
+      wx.createSelectorQuery().select('#sview').boundingClientRect(function(rect) {
+        this.viewHeight = wx.getSystemInfoSync().windowHeight - rect.top;
+      }).exec()
       console.log("授权:", res);
       this.sliderLeft = (res.windowWidth / this.tabs.length - sliderWidth) / 2;
       this.sliderOffset = res.windowWidth / this.tabs.length * this.activeIndex;
-
-      const { keyword, pageNo, pageSize } = this.selfData;
+      const {
+        keyword,
+        pageNo,
+        pageSize
+      } = this.selfData;
       this.requestTripList(
-        keyword, 
-        pageNo, 
-        pageSize, 
+        keyword,
+        pageNo,
+        pageSize,
         () => {
           this.selfData.pending = false;
         }
