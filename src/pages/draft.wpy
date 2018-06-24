@@ -1,18 +1,9 @@
 <template>
     <view class="trip-list">
         <repeat for="{{tripList}}" key="key">
-          <Trip 
-            :userId="item.userId"
-            :userName="item.userName"
-            :userImg="item.userImg"
-            :createTime="item.createTime"
-            :location="item.location"
-            :startTime="item.startTime"
-            :endTime="item.endTime"
-            :tripId="item.tripId"
-            />
+            <Trip :userId="item.userId" :userName="item.userName" :userImg="item.userImg" :createTime="item.createTime" :location="item.location" :startTime="item.startTime" :endTime="item.endTime" :tripId="item.tripId" />
         </repeat>
-      </view>
+    </view>
 </template>
 <script>
   import wepy from 'wepy'
@@ -28,7 +19,8 @@
     data = {
          tripList: [], // 行程列表数据
     };
-    请求行程数据
+    methods = {
+        //请求行程数据
     requestTripList(keyword = '', pageNo = 1, pageSize = 10, callback){
       HttpService.Post({
             urlName: 'queryTripListByWord',
@@ -40,64 +32,28 @@
             success: (code, data, msg) => {
               /* 查询记录成功 */
               if(code === 20000){
-                const { count, list } = data;
-                this.selfData.count = count;
-                if(count === 0){
-                  // 暂无数据
-                  this.upperControl.show(`没有搜索到"${keyword}"相关的行程`);
-                }else{
-                  if(pageNo === 1){
-                    // 新查询
-                    this.tripList = list;
-                    this.upperControl.show('加载中...');
-                  }else{
-                    // 后续的分页查询
-                    this.tripList = [...this.tripList, ...list];
-                  }
-                  if(pageNo * pageSize >= this.selfData.count){
-                    this.selfData.done = true;
-                    this.upperControl.show('--- 这是我的底线了 ---');
-                  }else{
-                    this.selfData.done = false;
-                  }
-                }
-                this.$apply();
-              }else{
-              /* 查询记录失败 */
-                if(pageNo === 1){
-                  this.upperControl.show('这里好像有bug');
-                }else{
-                  this.upperControl.show('加载失败');
-                }
-                this.$apply();
+                console.log(data)
               }
             },
             fail: (msg) => {
-                wx.showToast({
-                    title: '失败',
-                    icon: 'none'
-                });
-                if(pageNo === 1){
-                  this.upperControl.show('这里好像有bug');
-                }else{
-                  this.upperControl.show('加载失败');
-                }
-                this.$apply();
+                console.log(msg)
             },
             complete: () => {
               callback && callback();
               console.log('请求完成');
             }
-      });
+        })
+      
+      }
     }
   }
 </script>
 <style lang="less">
-.trip-list{
+.trip-list {
     box-sizing: border-box;
     background-color: #ddd;
     width: 100%;
-  }
+}
 </style>
 
 
