@@ -20,7 +20,8 @@
          tripList: [], // 行程列表数据
     };
     methods = {
-        //请求行程数据
+    }    
+    //请求行程数据
     requestTripList(keyword = '', pageNo = 1, pageSize = 10, callback){
       HttpService.Post({
             urlName: 'queryTripListByWord',
@@ -45,7 +46,6 @@
         })
       
       }
-    }
   }
 </script>
 <style lang="less">
