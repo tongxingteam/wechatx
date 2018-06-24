@@ -1,0 +1,120 @@
+<style lang="less">
+.apply-item {
+  padding: 20rpx 20rpx;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-content: center;
+  flex-wrap: wrap;
+  font-size: 32rpx;
+  border-bottom: 1px solid #ddd;
+  .item-lf {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    color: #333;
+    image {
+      width: 45rpx;
+      height: 45rpx;
+    }
+    .user-name {
+      margin-left: 10rpx;
+      margin-right: 20rpx; 
+    }
+    .apply-time {
+      color: #BBBBBB;
+      font-size: 24rpx;
+    }
+  }
+  .item-rt {
+    display: flex;
+    justify-content: flex-end;
+    .handle-btn {
+      width: 120rpx;
+      height: 60rpx;
+      font-size: 24rpx;
+      text-align: center;
+      margin-left: 10rpx;
+      background-color: rgba(18, 199, 211, 1);
+      border-radius: 8rpx;
+      color: #ffffff;
+      &:active {
+        background-color: rgb(20, 176, 187, 1);
+      }
+    }
+    .apply {
+      color: aqua;
+    }
+    .refuse {
+      color: red;
+    }
+  }
+}
+</style>
+<template>
+    <view>
+      <repeat for="{{apply_list}}">
+        <view class="apply-item" data-index="{{index}}">
+          <view class="item-lf">
+            <image src="{{item.user_avatar}}"/>
+            <view class="user-name">{{item.user_name}}</view>
+            <view class="apply-time">{{item.apply_time}}</view>
+          </view>
+          <view wx:if="{{item.states === 0}}" class="item-rt">
+            <button class="handle-btn" @tap.stop="agreeApply">同意</button>
+            <button class="handle-btn" @tap.stop="refuseApply">拒绝</button>
+          </view>
+          <view wx:elif="{{item.states === 1}}" class="item-rt">
+            <view class="apply">
+              已同意
+            </view>
+          </view>
+          <view wx:else="{{item.states === -1}}" class="item-rt">
+            <view class="refuse">
+              已拒绝
+            </view>
+          </view>
+        </view>
+      </repeat>
+    </view>
+</template>
+<script>
+import wepy from "wepy";
+
+export default class My extends wepy.page {
+  config = {
+    navigationBarTitleText: "申请列表"
+  };
+  data = {
+    apply_list: [
+      {
+        user_name: "里斯本",
+        user_avatar: "../images/icon_nav_search.png",
+        apply_time: "5分钟前",
+        states: 0,
+      },
+      {
+        user_name: "赵四",
+        user_avatar: "../images/icon_tabbar.png",
+        apply_time: "2小时前",
+        states: 1
+      },
+      {
+        user_name: "李四",
+        user_avatar: "../images/icon_tabbar.png",
+        apply_time: "3小时前",
+        states: -1
+      }
+    ]
+  };
+  methods = {
+    agreeApply() {
+      console.log("处理同意申请！");
+    },
+    refuseApply() {
+      console.log("处理拒绝申请！");
+    }
+  };
+}
+</script>
+

@@ -164,7 +164,8 @@
             navigationBarTitleText: '发布行程'
         }
         selfData = {
-            regionExp: /县|行政|自治|直辖|盟/
+            regionExp: /县|行政|自治|直辖|盟/,
+            originData: null
         }
         data = {
             hideAddBtn: false,
@@ -278,7 +279,7 @@
                 formData.trip_end_location = JSON.stringify(this.endRegionShow);
                 formData.trip_start_time = this.startTime;
                 formData.trip_end_time = this.endTime;
-                formData.trip_member_count = this.people;
+                formData.trip_merber_count = this.people;
                 formData.trip_other_desc = this.otherDesc;
                 formData.trip_publish_user_id = this.$parent.globalData.userInfo.uid;
                 return formData;
@@ -366,19 +367,10 @@
             this.startTimeRange.end = '';
             this.endTimeRange.end = '';
         }
-        // 查询草稿记录
-        queryThisTrip(trip_id, user_id){
-            
-        }
         // 组件加载完成
-        onLoad(config){
-            const { trip_id } = config;
-            if(typeof trip_id === 'undefined'){
-                this.initTime();
-            }else{
-                const user_id = this.$parent.globalData.userInfo.uid;
-                this.queryThisTrip(trip_id, user_id);
-            }
+        onLoad(){
+            this.selfData.originData = JSON.stringify(this.$data);
+            this.initTime();
         }
     }
 
