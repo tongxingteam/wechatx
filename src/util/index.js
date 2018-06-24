@@ -36,7 +36,7 @@ const HttpService = {
                     uid: wx.getStorageSync('uid'),
                     page: '',
                     platform: 'wechat',
-                    'content-type':'application/x-www-form-urlencoded'
+                    'content-type':'application/json'
                 },
                 data,
                 success: HttpService._success.bind(HttpService, success, fail),
