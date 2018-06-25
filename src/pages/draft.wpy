@@ -1,96 +1,242 @@
+<style lang="less">
+@rpx: 2rpx;
+page {
+    background-color: #f1f1f1;
+}
+.line-top {
+    width: 100%;
+    height: 2rpx;
+    background-color: #fff;
+}
+.draft {
+    width: 100%;
+    //height: 246rpx;
+    background-color: #fff;
+    box-sizing: border-box;
+    padding: 34rpx 20rpx;
+    display: flex;
+    margin-top: 5rpx;
+}
+.item-left {
+    width: 42 * @rpx;
+    text-align: center;
+    image {
+        width: 31 * @rpx;
+        height: 31 * @rpx;
+        background-color: #f1f1f1;
+        border-radius: 50%;
+    }
+}
+.item-right {
+    width: 320 * @rpx;
+    padding-left: 10rpx;
+    box-sizing: border-box;
+    line-height: 1.5rem;
+    .tight-top {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 13rpx;
+        .right-top-title,
+        .right-top-time {
+            color: rgba(146, 146, 146, 1);
+            font-size: 14px;
+            font-family: Arial;
+        }
+    }
+    .tight-center {
+        margin-bottom: 8 * @rpx;
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        flex-wrap: wrap;
+        .right-center-title {
+            color: rgba(16, 16, 16, 1);
+            font-size: 14px;
+            font-family: Arial;
+        }
+        .right-center-address {
+            min-width: 44 * @rpx;
+            height: 22 * @rpx;
+            padding: 0 5rpx;
+            line-height: 44rpx;
+            color: rgba(16, 16, 16, 1);
+            font-size: 12px;
+            text-align: center;
+            font-family: Arial;
+            border: 1rpx solid rgba(187, 187, 187, 1);
+            margin-right: 7 * @rpx;
+        }
+    }
+    .tight-bottom {
+        display: flex;
+        justify-content: space-between;
+        .right-bottom-time,
+        .right-bottom-nav {
+            line-height: 20px;
+            color: rgba(16, 16, 16, 1);
+            font-size: 14px;
+            text-align: center;
+            font-family: Arial;
+        }
+        .right-bottom-nav {
+            color: rgba(146, 146, 146, 1);
+            font-size: 12px;
+            font-family: Arial;
+        }
+    }
+}
+</style>
 <template>
-    <view class="trip-list">
-        <repeat for="{{tripList}}" key="key">
-            <Trip :userId="item.userId" :userName="item.userName" :userImg="item.userImg" :createTime="item.createTime" :location="item.location" :startTime="item.startTime" :endTime="item.endTime" :tripId="item.tripId" />
-        </repeat>
+  <view>
+    <view class="line-top"></view>
+    <view class="draft">
+      <view class="item-left">
+        <image src="" mode="scaleToFill" />
+      </view>
+      <view class="item-right">
+        <view class="tight-top">
+          <text class="right-top-title">用户昵称</text>
+          <text class="right-top-time">2018-2-2</text>
+        </view>
+        <view class="tight-center">
+          <text class="right-center-title">目的地：</text>
+          <text class="right-center-address">故宫</text>
+          <text class="right-center-address">颐和园</text>
+        </view>
+        <view class="tight-bottom">
+          <text class="right-bottom-time">时间:2011-1-1~20112-2-2</text>
+          <navigator url="/pages/draft_item">
+            <text class="right-bottom-nav">查看详情</text>
+          </navigator>
+        </view>
+      </view>
     </view>
+
+    <view class="draft">
+      <view class="item-left">
+        <image src="" mode="scaleToFill" />
+      </view>
+      <view class="item-right">
+        <view class="tight-top">
+          <text class="right-top-title">用户昵称</text>
+          <text class="right-top-time">2018-2-2</text>
+        </view>
+        <view class="tight-center">
+          <text class="right-center-title">目的地：</text>
+          <text class="right-center-address">故宫</text>
+          <text class="right-center-address">颐和园</text>
+        </view>
+        <view class="tight-bottom">
+          <text class="right-bottom-time">时间:2011-1-1~20112-2-2</text>
+          <navigator url="/pages/draft_item">
+            <text class="right-bottom-nav">查看详情</text>
+          </navigator>
+        </view>
+      </view>
+    </view>
+
+
+    <view class="draft">
+      <view class="item-left">
+        <image src="" mode="scaleToFill" />
+      </view>
+      <view class="item-right">
+        <view class="tight-top">
+          <text class="right-top-title">用户昵称</text>
+          <text class="right-top-time">2018-2-2</text>
+        </view>
+        <view class="tight-center">
+          <text class="right-center-title">目的地：</text>
+          <text class="right-center-address">故宫</text>
+          <text class="right-center-address">颐和园</text>
+        </view>
+        <view class="tight-bottom">
+          <text class="right-bottom-time">时间:2011-1-1~20112-2-2</text>
+          <navigator url="/pages/draft_item">
+            <text class="right-bottom-nav">查看详情</text>
+          </navigator>
+        </view>
+      </view>
+    </view>
+
+  </view>
+
 </template>
 <script>
-  import wepy from 'wepy'
-  import Trip from '../components/trip'
-  import HttpService from '../util';
-  export default class Draft extends wepy.page {
-      config = {
-        navigationBarTitleText: '我的草稿',
+import wepy from "wepy";
+import Trip from "../components/trip";
+import HttpService from "../util";
+export default class Draft extends wepy.page {
+    config = {
+        navigationBarTitleText: "我的草稿",
+        navigationBarBackgroundColor: "#f1f1f1"
     };
     components = {
         Trip
     };
     selfData = {
-      keyword: '',
-      pageNo: 1, // 当前页
-      pageSize: 10, // 每页的数量
-      count: 35, // 总数据量
-      done: false, // 是否加载完全部数据
-      pending: false // 是否正在请求分页数据
+        keyword: "",
+        pageNo: 1, // 当前页
+        pageSize: 10, // 每页的数量
+        count: 35, // 总数据量
+        done: false, // 是否加载完全部数据
+        pending: false // 是否正在请求分页数据
     };
     data = {
-         tripList: [], // 行程列表数据
+        tripList: [] // 行程列表数据
     };
-    onLoad () {
+    onLoad() {
         // 初始化数据请求
-      const { keyword, pageNo, pageSize } = this.selfData;
-      this.requestTripList(
-        keyword, 
-        pageNo, 
-        pageSize, 
-        () => {
-          this.selfData.pending = false;
-        }
-      );
-    };
-    methods = {
-    };    
+        const { keyword, pageNo, pageSize } = this.selfData;
+        this.requestTripList(keyword, pageNo, pageSize, () => {
+            this.selfData.pending = false;
+        });
+    }
+    methods = {};
     //请求行程数据
-    requestTripList(keyword = '', pageNo = 1, pageSize = 10, callback){
-      HttpService.Post({
-            urlName: 'queryTripListByWord',
+    requestTripList(keyword = "", pageNo = 1, pageSize = 10, callback) {
+        HttpService.Post({
+            urlName: "queryTripListByWord",
             data: {
                 keyword,
                 pageNo,
                 pageSize
             },
             success: (code, data, msg) => {
-              /* 查询记录成功 */
-              if(code === 20000){
-                console.log(data)
-                const { count, list } = data;
-                this.selfData.count = count;
-                if(count === 0){
-                  // 暂无数据
-                  this.upperControl.show(`没有搜索到"${keyword}"相关的行程`);
-                }else{
-                  if(pageNo === 1){
-                    // 新查询
-                    this.tripList = list;
-                    //this.upperControl.show('加载中...');
-                  }else{
-                    // 后续的分页查询
-                    this.tripList = [...this.tripList, ...list];
-                  }
-                  
+                /* 查询记录成功 */
+                if (code === 20000) {
+                    console.log(data);
+                    const { count, list } = data;
+                    this.selfData.count = count;
+                    if (count === 0) {
+                        // 暂无数据
+                        this.upperControl.show(
+                            `没有搜索到"${keyword}"相关的行程`
+                        );
+                    } else {
+                        if (pageNo === 1) {
+                            // 新查询
+                            this.tripList = list;
+                            //this.upperControl.show('加载中...');
+                        } else {
+                            // 后续的分页查询
+                            this.tripList = [...this.tripList, ...list];
+                        }
+                    }
+                    this.$apply();
                 }
-                this.$apply();
-              }
             },
-            fail: (msg) => {
-                console.log(msg)
+            fail: msg => {
+                console.log(msg);
             },
             complete: () => {
-              callback && callback();
-              console.log('请求完成');
+                callback && callback();
+                console.log("请求完成");
             }
-        })
-      
-      }
-  }
-</script>
-<style lang="less">
-.trip-list {
-    box-sizing: border-box;
-    background-color: #ddd;
-    width: 100%;
+        });
+    }
 }
-</style>
+</script>
+
 
 

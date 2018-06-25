@@ -1,24 +1,30 @@
 Arguments: 
-  /Users/richard/.nvm/versions/node/v8.9.4/bin/node /Users/richard/.yarn/bin/yarn.js
+  D:\nodejs\nodejs\node.exe D:\nodejs\nodejs\node_cache\node_modules\yarn\bin\yarn.js add wepy-compiler-scss -D
 
 PATH: 
-  /Users/richard/.yarn/bin:/Users/richard/.config/yarn/global/node_modules/.bin:/Library/Java/JavaVirtualMachines/jdk1.7.0_80.jdk/Contents/Home/bin:/Users/richard/.nvm/versions/node/v8.9.4/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin::/Users/richard/ubtour/apache-maven//bin
+  C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;C:\Program Files\Git\cmd;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;D:\ApacheTomcat\apache-tomcat-7.0.84\bin;D:\nodejs\nodejs\node_cache;D:\nodejs\nodejs\;C:\Program Files (x86)\Windows Kits\8.1\Windows Performance Toolkit\;D:\Android Studio\Android\sdk\tools;;C:\WINDOWS\System32\OpenSSH\;D:\python\python-2.7.15\Scripts;D:\python\python-2.7.15\;D:\python\python-3.6.5\Scripts\;D:\python\python-3.6.5\;C:\Users\1\AppData\Local\Microsoft\WindowsApps;C:\Users\1\AppData\Local\atom\bin;D:\ApacheTomcat\apache-tomcat-7.0.84\bin;D:\Visual Studio Code\Microsoft VS Code\bin;D:\Android Studio\Android\sdk\tools;D:\Android Studio\Android\sdk\platform-tools;C:\Program Files\Java\jdk1.8.0_171\bin;C:\Program Files\Java\jdk1.8.0_171\jre\bin;;C:\Users\1\AppData\Local\Microsoft\WindowsApps
 
 Yarn version: 
   1.7.0
 
 Node version: 
-  8.9.4
+  8.10.0
 
 Platform: 
-  darwin x64
+  win32 x64
 
 Trace: 
-  Error: https://registry.yarnpkg.com/mockjs: ETIMEDOUT
-      at Timeout._onTimeout (/Users/richard/.yarn/lib/cli.js:135339:19)
-      at ontimeout (timers.js:475:11)
-      at tryOnTimeout (timers.js:310:5)
-      at Timer.listOnTimeout (timers.js:270:5)
+  Error: https://registry.npm.taobao.org/wepy-compiler-scss: Not found
+      at Request.params.callback [as _callback] (D:\nodejs\nodejs\node_cache\node_modules\yarn\lib\cli.js:65656:18)
+      at Request.self.callback (D:\nodejs\nodejs\node_cache\node_modules\yarn\lib\cli.js:134675:22)
+      at emitTwo (events.js:126:13)
+      at Request.emit (events.js:214:7)
+      at Request.<anonymous> (D:\nodejs\nodejs\node_cache\node_modules\yarn\lib\cli.js:135658:10)
+      at emitOne (events.js:116:13)
+      at Request.emit (events.js:211:7)
+      at IncomingMessage.<anonymous> (D:\nodejs\nodejs\node_cache\node_modules\yarn\lib\cli.js:135578:12)
+      at Object.onceWrapper (events.js:313:30)
+      at emitNone (events.js:111:20)
 
 npm manifest: 
   {
@@ -1056,6 +1062,10 @@ Lockfile:
     resolved "https://registry.yarnpkg.com/combined-stream/-/combined-stream-1.0.6.tgz#723e7df6e801ac5613113a7e445a9b69cb632818"
     dependencies:
       delayed-stream "~1.0.0"
+  
+  commander@*:
+    version "2.15.1"
+    resolved "http://registry.npm.taobao.org/commander/download/commander-2.15.1.tgz#df46e867d0fc2aec66a34662b406a9ccafff5b0f"
   
   commander@~2.8.1:
     version "2.8.1"
@@ -2838,6 +2848,12 @@ Lockfile:
     resolved "https://registry.yarnpkg.com/mkdirp/-/mkdirp-0.5.1.tgz#30057438eac6cf7f8c4767f38648d6697d75c903"
     dependencies:
       minimist "0.0.8"
+  
+  mockjs@^1.0.1-beta3:
+    version "1.0.1-beta3"
+    resolved "http://registry.npm.taobao.org/mockjs/download/mockjs-1.0.1-beta3.tgz#d234f3c27256397564f2c955142e891909537209"
+    dependencies:
+      commander "*"
   
   mozjpeg@^4.0.0:
     version "4.1.1"
