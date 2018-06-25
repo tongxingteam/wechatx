@@ -232,21 +232,21 @@ export default class Trip extends wepy.page {
       this.upperMsg = "";
     }
   };
-  requestTripDetail(callback) {
+  requestTripDetail(query,callback) {
     HttpService.Post({
       urlName: "queryTripDetail",
-      data: {
-        trip_id: "5cbe08506b0011e8a53a53d3bea89acf",
-        user_id: "b019406067d511e89c437132ae595195",
-        // user_id: "a019406067d511e89c437132ae595195",
-      },
+      data: query,
       success: (code, data, msg) => {
         console.log(code);
         /* 查询记录成功 */
         if (code === 20000) {
           console.log(data);
           // const { count, list } = data;
-          
+          var trip_member_info = data.trip_member_info;
+          var trip_end_location = data.trip_end_location
+          this.travel_data = data;
+          this.travel_data.trip_member_info = JSON.parse(trip_member_info);
+          this.travel_data.trip_end_location = JSON.parse(trip_end_location);
           this.$apply();
         } else {
           this.upperControl.show("加载失败");
@@ -267,8 +267,12 @@ export default class Trip extends wepy.page {
       }
     });
   }
-  onLoad() {
-    this.requestTripDetail()
+  onLoad(option) {
+    console.log("ddddd",option)
+    this.requestTripDetail({
+        trip_id: option.tripId,
+        user_id: 'a019406067d511e89c437132ae595195'
+      })
   }
 }
 </script>
