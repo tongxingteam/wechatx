@@ -42,6 +42,36 @@ page {
         top: 52rpx;
         right: 30rpx;
     }
+    .rture_region {
+        width: 100%;
+        padding: 0 41 * @rpx 16 * @rpx 40 * @rpx;
+        background-color: #fff;
+        border-bottom: 1rpx solid #f1f1f1;
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        .address {
+            width: 20 * @rpx;
+            height: 20 * @rpx;
+            border: 1rpx solid #101010;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 17 * @rpx;
+            font-size: 16px;
+            margin-left: 20rpx;
+        }
+        input {
+            width: 60 * @rpx;
+            height: 30 * @rpx;
+            //padding: 0 10rpx;
+            //box-sizing: border-box;
+            border: 1px solid #bbb;
+            font-size: 12px;
+            text-align: center;
+            margin-right: 10rpx;
+            margin-bottom: 5rpx;
+        }
+    }
     .tourDescription {
         border-bottom: none;
     }
@@ -68,16 +98,22 @@ page {
             </picker>
         </view>
 
-        <view class="section__title right-icon">
+        <view class="section__title tourDescription">
             <view class="left">
                 <i class="iconfont tx-biaoji icon" style="margin-right: 12rpx;"></i>
                 <text class="title">目的地</text>
             </view>
-            <picker mode="region" @change="bindDestinationRegionChange" value="{{destination_region}}">
+        </view>
+        <view class="rture_region">
+            <!-- <picker mode="region" @change="bindDestinationRegionChange" value="{{destination_region}}">
                 <view class="picker">
-                    {{destination_region[0]}}，{{destination_region[1]}}，{{destination_region[2]}}
+                    {{destination_region[0]}}，{{destination_region[1]}}，{{destination_region[2]}} 
                 </view>
-            </picker>
+            </picker> -->
+            <view wx:for="{{addressNumber}}" wx:key="{{}}">
+                <input placeholder="请输入" maxlength="10" @input="addressInput" @blur="addressBlur" />
+            </view>
+            <view class="address" @tap="address"> + </view>
         </view>
 
         <view class="section__title right-icon">
@@ -123,7 +159,7 @@ page {
             </view>
         </view>
         <view class="textarea-wrp">
-            <textarea @input="tourDescription" adjust-position cursor-spacing="200px"/>
+            <textarea @input="tourDescription" adjust-position cursor-spacing="200px" />
         </view>
 
         <button type="primary" size="{{primarySize}}" loading="{{loading}}" plain="{{false}}" disabled="{{disabled}}" @tap="continueTopublish"> {{buttonText}} </button>
@@ -142,7 +178,8 @@ export default class Publish extends wepy.page {
     selfData = {};
     data = {
         departure_region: ["北京市", "北京市", "朝阳区"],
-        destination_region: ["北京市", "北京市", "朝阳区"],
+        destination_region: [],
+        addressNumber: ["1"],
         setOff_startDate: this.Format(new Date(), "yyyy-MM-dd"),
         return_startDate: this.Format(
             new Date(this.Format(new Date(), "yyyy-MM-dd")).setDate(
@@ -153,7 +190,7 @@ export default class Publish extends wepy.page {
         numberOfparticipants_index: 0,
         numberOfparticipants: ["1", "2", "3", "4"],
         tourDescriptionText: "",
-        buttonText:"继续发布",
+        buttonText: "继续发布",
         disabled: false,
         loading: false
     };
@@ -165,9 +202,26 @@ export default class Publish extends wepy.page {
             this.departure_region = e.detail.value;
         },
         //目的地
-        bindDestinationRegionChange: function(e) {
-            console.log("picker发送选择改变，携带值为", e.detail.value);
-            this.destination_region = e.detail.value;
+        // bindDestinationRegionChange: function(e) {
+        //     console.log("picker发送选择改变，携带值为", e.detail.value);
+        //     this.destination_region = e.detail.value;
+        // },
+        address: function() {
+            this.addressNumber.push(`${this.addressNumber.length + 1}`);
+            console.log(this.addressNumber);
+            //this.$apply();
+        },
+        addressInput:function(e){
+            // let text = e.detail.value
+            // console.log(text)
+        },
+        addressBlur:function(e){
+            console.log(e)
+            if(e.detail.value && this.destination_region.indexOf(e.detail.value) == -1){
+                this.destination_region.push(e.detail.value)
+            }
+           
+            console.log(this.destination_region)
         },
         //出发日期
         bindSetOffStartDateChange: function(e) {
@@ -188,30 +242,31 @@ export default class Publish extends wepy.page {
         tourDescription: function(e) {
             this.tourDescriptionText = e.detail.value;
             console.log(e.detail.value);
+        },
+        //继续发布
+        continueTopublish() {
+            console.log("aaaaaaa");
+            this.buttonText = "发布中";
+            this.disabled = true;
+            this.loading = true;
+            wx.showModal({
+                title: "提示",
+                content: `${this.departure_region},${this.destination_region},${
+                    this.setOff_startDate
+                },${this.return_startDate},${
+                    this.numberOfparticipants[this.numberOfparticipants_index]
+                },${this.tourDescriptionText}`,
+                success: function(res) {
+                    if (res.confirm) {
+                        console.log("用户点击确定");
+                    } else if (res.cancel) {
+                        console.log("用户点击取消");
+                    }
+                }
+            });
         }
     };
-    //继续发布
-    continueTopublish() {
-        console.log("aaaaaaa");
-        this.buttonText = "发布中"
-        this.disabled = true;
-        this.loading = true;
-        wx.showModal({
-            title: "提示",
-            content: `${this.departure_region},${this.destination_region},${
-                this.setOff_startDate
-            },${this.return_startDate},${
-                this.numberOfparticipants[this.numberOfparticipants_index]
-            },${this.tourDescriptionText}`,
-            success: function(res) {
-                if (res.confirm) {
-                    console.log("用户点击确定");
-                } else if (res.cancel) {
-                    console.log("用户点击取消");
-                }
-            }
-        });
-    }
+
     //日期格式化
     Format(date, fmt) {
         let a = new Date(date);
