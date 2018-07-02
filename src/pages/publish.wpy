@@ -151,7 +151,7 @@
             </view>
         </view>
         <view class="inline-box" style="border:0;padding: 10rpx 10rpx;">
-            <button class="pub-btn" @tap.stop="publish">发 布</button>
+            <button class="pub-btn" @tap.stop="publish">{{submitBtnText}}</button>
         </view>
     </view>
 </template>
@@ -164,7 +164,10 @@
             navigationBarTitleText: '发布行程'
         }
         selfData = {
-            regionExp: /县|行政|自治|直辖|盟/
+            regionExp: /县|行政|自治|直辖|盟/,
+            trip_mode: '', // 当前页面的模式
+            originTrip: null,
+            out_mode: '' // 退出当前页面的模式
         }
         data = {
             hideAddBtn: false,
@@ -186,6 +189,7 @@
                 start: '',
                 end: ''
             },
+            submitBtnText: '发布'
         }
         methods = {
             // 出发地被选择
@@ -223,7 +227,7 @@
                     this.hideAddBtn = false;
                 }
             },
-            // 触发时间被选择
+            // 出发时间被选择
             selectStartTime(e){
                 this.startTime = e.detail.value;
                 this.endTimeRange.start = this.getOtherDay(this.startTime, 'next');
@@ -240,7 +244,7 @@
             },
             // 确认说明
             confirmDesc(e){
-                this.otherDesc = e.detail.value.replace(/党|sb/ig, '');
+                this.otherDesc = e.detail.value.replace(/党|sb/ig, '').trim();
             },
             publish(){
                 //参数校验
@@ -256,8 +260,7 @@
             }
         }
         // 检查数据合法性
-        checkForm(){
-            const formData = {};
+        checkForm(noMsg){
             let msg = '';
             if(this.startRegionShow === '请选择'){
                 msg = '请选择出发地';
@@ -270,39 +273,65 @@
             }else if(this.people === '请选择'){
                 msg = '请选择参团的人数';
             }
-            if(msg.length !== 0){
-                this.showMsg(msg);
-                return false;
+            if(noMsg){
+                return msg.length === 0;
             }else{
-                formData.trip_start_location = this.startRegionShow;
-                formData.trip_end_location = JSON.stringify(this.endRegionShow);
-                formData.trip_start_time = this.startTime;
-                formData.trip_end_time = this.endTime;
-                formData.trip_member_count = this.people;
-                formData.trip_other_desc = this.otherDesc;
-                formData.trip_publish_user_id = this.$parent.globalData.userInfo.uid;
-                return formData;
+                if(msg.length !== 0){
+                    this.showMsg(msg);
+                    return false;
+                }else{
+                    const formData = this.diffTrip();
+                    if(this.selfData.trip_mode === 'edit_trip' && formData === false){
+                        this.showMsg('行程信息未改变');
+                        return false;
+                    }
+                    return formData;
+                }
             }
         }
-        // 发送数据
+        // 发布行程(新的以及修改的)
         pushTrip(data, callback){
+            let urlName = 'publishTrip';
+            const { trip_mode, trip_id } = this.selfData;
+            if(trip_mode === 'edit_trip'){
+                // 编辑已发布的行程信息
+                data.trip_id = trip_id;
+            }else if(trip_mode === 'draft'){
+                // 发布草稿为行程信息
+                data.trip_id = trip_id;
+                urlName = 'publishDraftToTrip';
+            }
+            const Msg = ((mode)=>{
+                if(mode === 'edit_trip'){
+                    return {
+                        success: '修改成功',
+                        fail: '修改失败'
+                    };
+                }else{
+                    return {
+                        success: '发布成功',
+                        fail: '发布失败'
+                    };
+                }
+            })(trip_mode);
+
             HttpService.Post({
-                urlName: 'publishTrip',
+                urlName: urlName,
                 data: data,
                 success: (code, data, msg) => {
                     if(code === 20000){
                         wx.showToast({
-                            title: '发布成功',
+                            title: Msg.success,
                             icon: 'success',
                             mask: true,
                             complete: () => {
-                                this.resetForm();
-                                this.$apply();
+                                this.selfData.out_mode = 'publish_trip';
+                                wx.navigateBack();
                             }
                         });
                     }else{
                         wx.showToast({
-                            title: '发布失败',
+                            title: Msg.fail,
                             icon: 'none',
                             mask: true
                         });
@@ -310,7 +339,7 @@
                 },
                 fail: (msg) => {
                     wx.showToast({
-                        title: '发布失败',
+                        title: Msg.fail,
                         icon: 'none',
                         mask: true
                     });
@@ -326,20 +355,6 @@
                 title: msg,
                 icon: 'none'
             });
-        }
-        // 重置表单
-        resetForm(){
-            this.hideAddBtn = false;
-            this.peopleKey = 0;
-            this.startRegionShow = '请选择';
-            this.startRegion = [];
-            this.endRegionShow = [];
-            this.endRegin = [];
-            this.startTime = '请选择';
-            this.endTime = '请选择';
-            this.people = '请选择';
-            this.otherDesc = '';
-            this.initTime();
         }
         // 获取指定日期
         getOtherDay(time, flag){
@@ -366,18 +381,220 @@
             this.startTimeRange.end = '';
             this.endTimeRange.end = '';
         }
-        // 查询草稿记录
+        // 查询行程记录
         queryThisTrip(trip_id, user_id){
-            
+            wx.showLoading({
+                title: '正在为您获取行程',
+                mask: true
+            });
+            HttpService.Post({
+                urlName: 'queryTripDetail',
+                data: {
+                    trip_id,
+                    user_id
+                },
+                success: (code, data, msg) => {
+                    if(code === 20000){
+                        this.setForm(data);
+                    }else{
+                        wx.showToast({
+                            title: '查询您的行程草稿失败',
+                            icon: 'none',
+                            mask: true,
+                            duration: 2000,
+                            complete: () => {
+                                this.selfData.out_mode = 'query_fail';
+                                wx.setStorageSync('publish', 0);
+                                wx.navigateBack();
+                            }
+                        });
+                    }
+                },
+                fail: (msg) => {
+                    wx.showToast({
+                        title: '查询您的行程草稿失败',
+                        icon: 'none',
+                        mask: true,
+                        duration: 2000,
+                        complete: () => {
+                            this.selfData.out_mode = 'query_fail';
+                            wx.setStorageSync('publish', 0);
+                            wx.navigateBack();
+                        }
+                    });
+                },
+                complete: () => {
+                    wx.hideLoading();
+                }
+            });
         }
-        // 组件加载完成
-        onLoad(config){
-            const { trip_id } = config;
-            if(typeof trip_id === 'undefined'){
-                this.initTime();
+        // 比较行程信息是否改变
+        diffTrip(){
+            let isDiff = false;
+            const { originTrip } = this.selfData;
+            const formData = {};
+            if(originTrip !== null){
+                const hasOwnProperty = Object.prototype.hasOwnProperty;
+                for(let key in originTrip){
+                    if(hasOwnProperty.call(originTrip, key)){
+                        if(Array.isArray(originTrip[key])){
+                            if(JSON.stringify(originTrip[key]) !== JSON.stringify(this[key])){
+                                isDiff = true;
+                                break;
+                            }
+                        }else{
+                            if(originTrip[key] !== this[key]){
+                                isDiff = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+            if(isDiff === true || originTrip === null){
+                formData.trip_start_location = JSON.stringify([this.startRegionShow, this.startRegion]);
+                formData.trip_end_location = JSON.stringify([this.endRegionShow, this.endRegion]);
+                formData.trip_start_time = this.startTime;
+                formData.trip_end_time = this.endTime;
+                formData.trip_member_count = this.people;
+                formData.trip_other_desc = this.otherDesc;
+                formData.trip_publish_user_id = this.$parent.globalData.userInfo.uid;
+                return formData;
+            }
+            return false;
+        }
+        // 依据数据设置表单显示内容
+        setForm (trip) {
+            let { 
+                trip_start_location,
+                trip_end_location,
+                trip_start_time,
+                trip_end_time,
+                trip_merber_count,
+                trip_other_desc
+            } = trip;
+            trip_start_location = JSON.parse(trip_start_location);
+            trip_end_location = JSON.parse(trip_end_location);
+
+            this.startRegionShow = trip_start_location[0]; // 开始地点(显示)
+            this.startRegion = trip_start_location[1]; // 开始地点(实际)
+            this.endRegionShow = trip_end_location[0]; // 结束地点(显示)
+            this.endRegion = trip_end_location[1]; // 结束地点(实际)
+            this.people = trip_merber_count; // 行程人数
+            this.peopleKey = this.peopleRange.indexOf(+trip_merber_count); // 人数索引
+            this.otherDesc = trip_other_desc; // 行程说明
+            const nowDay = this.getOtherDay();
+            if(nowDay < trip_start_time){
+                this.startTime = trip_start_time;
+                this.endTime = trip_end_time;
+            }else if(nowDay >= trip_start_time && nowDay <= trip_end_time){
+                this.startTime = nowDay;
+                if(new Date(`${trip_end_time} 00:00:00`).getTime() - new Date(`${nowDay} 00:00:00`).getTime() > 86400000){
+                    this.endTime = trip_end_time;
+                }else{
+                    this.endTime = this.getOtherDay(nowDay, 'next');
+                }
             }else{
-                const user_id = this.$parent.globalData.userInfo.uid;
-                this.queryThisTrip(trip_id, user_id);
+                this.startTime = nowDay;
+                this.endTime = this.getOtherDay(nowDay, 'next');
+            }
+            this.startTimeRange.start = nowDay;
+            this.endTimeRange.start = this.getOtherDay(nowDay, 'next');
+            // 如果是修改已经发布的行程信息，则需要将初始信息保存起来，用于比较是否数据改变
+            if(this.selfData.trip_mode === 'edit_trip'){
+                this.selfData.originTrip = {
+                    startRegionShow: this.startRegionShow,
+                    endRegionShow: [...this.endRegionShow],
+                    startTime: this.startTime,
+                    endTime: this.endTime,
+                    people: this.people,
+                    otherDesc: this.otherDesc
+                };
+            }
+        }
+        // 页面加载完成
+        onLoad(config){
+            this.selfData.out_mode = '';
+            const { trip_id, trip_mode } = config;
+            if(trip_mode === 'draft'){
+                // 由我的草稿进入
+                this.selfData.trip_id = trip_id;
+                this.selfData.trip_mode = 'draft';
+                this.queryThisTrip(trip_id, this.$parent.globalData.userInfo.uid);
+            }else{
+                if(typeof trip_id === 'undefined'){
+                    // 发布新的行程
+                    this.selfData.trip_mode = 'new_trip';
+                    this.initTime();
+                }else{
+                    // 修改已经发布的行程内容
+                    this.selfData.trip_id = trip_id;
+                    this.selfData.trip_mode = 'edit_trip';
+                    this.submitBtnText = '修改';
+                    this.queryThisTrip(trip_id, this.$parent.globalData.userInfo.uid);
+                }
+            }
+        }
+        // 页面卸载
+        onUnload(){
+            const { trip_mode, out_mode, trip_id } = this.selfData;
+            const formData = this.diffTrip();
+            if(out_mode.length === 0){
+                if(trip_mode === 'draft'){
+                    // 查看我的草稿并正常退出时
+                    if(formData){
+                        wx.showModal({
+                            title: '同行',
+                            content: '您的草稿已改动，是否保存',
+                            cancelText: '算了',
+                            confirmText: '保存',
+                            cancelColor: '#dddddd',
+                            confirmColor: '#12C7D3',
+                            success: ({confirm, cancel}) => {
+                                if(confirm){
+                                    // 请求保存草稿接口
+                                }
+                            }
+                        });
+                    }
+                }else if(trip_mode === 'new_trip'){
+                    // 发布新的行程并直接正常的退出时新建草稿
+                    if(this.checkForm(true)){
+                        wx.showModal({
+                            title: '同行',
+                            content: '是否将您未发布的行程保存为草稿',
+                            cancelText: '算了',
+                            cancelColor: '#dddddd',
+                            confirmText: '保存',
+                            confirmColor: '#12C7D3',
+                            success: ({confirm, cancel}) => {
+                                if(confirm){
+                                    // 请求保存草稿接口
+                                }
+                            }
+                        });
+                    }
+                }else if(trip_mode === 'edit_trip'){
+                    // 编辑已发布的行程并直接正常的退出时
+                    if(formData){
+                        wx.showModal({
+                            title: '同行',
+                            content: '您的行程信息已改动，是否保存',
+                            cancelText: '算了',
+                            cancelColor: '#dddddd',
+                            confirmText: '保存',
+                            confirmColor: '#12C7D3',
+                            success: ({confirm, cancel}) => {
+                                if(confirm){
+                                    // 请求修改行程接口
+                                }
+                            }
+                        });
+                    }
+                }
+            }else if(out_mode === 'publish_trip'){
+                // 当发布新的行程或者修改行程发布成功时
+                wx.setStorageSync('publishToFresh', 1);
             }
         }
     }

@@ -134,215 +134,222 @@ import Trip from "../components/trip";
 import HttpService from "../util";
 import bmap from "../libs/bmap-wx.js";
 
-export default class Index extends wepy.page {
-  config = {
-    navigationBarTitleText: "与我同行"
-  };
-  components = {
-    Trip
-  };
-  selfData = {
-    keyword: "",
-    pageNo: 1, // 当前页
-    pageSize: 10, // 每页的数量
-    count: 35, // 总数据量
-    done: false, // 是否加载完全部数据
-    pending: false // 是否正在请求分页数据
-  };
-  data = {
-    canIUse: wepy.canIUse("button.open-type.getUserInfo"),
-    userInfo: null || "暂无数据",
-    imgUrls: [
-      "http://img02.tooopen.com/images/20150928/tooopen_sy_143912755726.jpg",
-      "http://img06.tooopen.com/images/20160818/tooopen_sy_175866434296.jpg",
-      "http://img06.tooopen.com/images/20160818/tooopen_sy_175833047715.jpg"
-    ],
-    indicatorDots: true,
-    autoplay: true,
-    interval: 5000,
-    duration: 1000,
-    tripList: [], // 行程列表数据
-    viewHeight: 500, //信息展示窗口的高度
-    upperMsg: "",
-    sugData: [],
-    searchValue: ""
-  };
-  // 上滑显示提示
-  upperControl = {
-    show: msg => {
-      this.upperMsg = msg;
-    },
-    hide: () => {
-      this.upperMsg = "";
+  export default class Index extends wepy.page {
+    config = {
+      navigationBarTitleText: '与我同行',
+      enablePullDownRefresh: false,
     }
-  };
-  methods = {
-    // bindGetUserInfo: function(e) {
-    //   if (e.source.data.userInfo) {
-    //     console.log('用户已经授权！')
-    //   } else {
-    //     console.log('用户按了拒绝按钮')
-    //   }
-    // },
-    // getUserInfo: function() {
-    //   this.$parent.getUserInfo(function(data) {
-    //     console.log(data)
-    //   })
-    // },
-    // 加载更多行程信息
-    loadMoreTrip() {
-      if (this.selfData.pending === false && this.selfData.done === false) {
-        this.selfData.pending = true;
-        this.selfData.pageNo++;
-        this.requestTripList(
-          this.selfData.keyword,
-          this.selfData.pageNo,
-          this.selfData.pageSize,
-          () => {
-            this.selfData.pending = false;
-          }
-        );
-      }
-    },
-    // 搜索
-    search(event) {
-      this.sugData = [];
-      this.$apply();
-      if (this.selfData.pending === false) {
-        this.selfData.pending = true;
-        this.selfData.keyword = event.detail.value
-          .replace(/^\s+/, "")
-          .replace(/\s+$/, "");
-        this.selfData.pageNo = 1;
-        this.requestTripList(
-          this.selfData.keyword,
-          this.selfData.pageNo,
-          this.selfData.pageSize,
-          () => {
-            this.selfData.pending = false;
-          }
-        );
-      }
-    },
-    bindKeyInput: function(e) {
-      var that = this;
-      // 新建百度地图对象
-      var BMap = new bmap.BMapWX({
-        ak: "Thbr5LPMtcCxLFpzRhuMHfBzbOzBBDSW"
-      });
-      var fail = function(data) {
-        console.log(data);
-      };
-      var success = function(data) {
-        // console.log(data.result);
-        // var sugData = "";
-        // for (var i = 0; i < data.result.length; i++) {
-        //   sugData = sugData + data.result[i].name + "\n";
-        // }
-        that.sugData = data.result;
-        that.$apply();
-        // that.setData({
-        //   sugData: sugData
-        // });
-      };
-      // 发起suggestion检索请求
-      BMap.suggestion({
-        query: e.detail.value,
-        region: "北京",
-        city_limit: true,
-        fail: fail,
-        success: success
-      });
-    },
-    handleSearch: function(e) {
-      console.log(e.target.dataset.name);
-      this.sugData = [];
-      var search_keyword = e.target.dataset.name;
-      this.searchValue = search_keyword;
-      this.$apply();
-      this.requestTripList(search_keyword, 1, 10, function() {});
+    components = {
+        Trip
     }
-  };
-  // 请求行程数据
-  requestTripList(keyword = "", pageNo = 1, pageSize = 10, callback) {
-    HttpService.Post({
-      urlName: "queryTripListByWord",
-      data: {
-        keyword,
-        pageNo,
-        pageSize
+    selfData = {
+      keyword: '',
+      pageNo: 1, // 当前页
+      pageSize: 10, // 每页的数量
+      count: 35, // 总数据量
+      done: false, // 是否加载完全部数据
+      pending: false, // 是否正在请求分页数据
+      BMap: new bmap.BMapWX({ // 新建百度地图对象
+          ak: "Thbr5LPMtcCxLFpzRhuMHfBzbOzBBDSW"
+      })
+    }
+    data = {
+      canIUse: wepy.canIUse('button.open-type.getUserInfo'),
+      userInfo: null || '暂无数据',
+      imgUrls: [
+        'http://img02.tooopen.com/images/20150928/tooopen_sy_143912755726.jpg',
+        'http://img06.tooopen.com/images/20160818/tooopen_sy_175866434296.jpg',
+        'http://img06.tooopen.com/images/20160818/tooopen_sy_175833047715.jpg'
+      ],
+      indicatorDots: true,
+      autoplay: true,
+      interval: 5000,
+      duration: 1000,
+      tripList: [], // 行程列表数据
+      viewHeight: 500, //信息展示窗口的高度
+      upperMsg: '',
+      keyword: ''
+    }
+    // 控制提示
+    upperControl = {
+      show: (msg) => {
+        this.upperMsg = msg;
       },
-      success: (code, data, msg) => {
-        /* 查询记录成功 */
-        if (code === 20000) {
-          let { count, list } = data;
-          for(let i = 0, len = list.length; i<len; i++){
-            list[i]['trip_end_location'] = JSON.parse(JSON.parse(list[i]['trip_end_location']));
-          }
-          console.log(list);
-          this.selfData.count = count;
-          if (count === 0) {
-            // 暂无数据
-            this.upperControl.show(`没有搜索到"${keyword}"相关的行程`);
-          } else {
-            if (pageNo === 1) {
-              // 新查询
-              this.tripList = list;
-              this.upperControl.show("加载中...");
-            } else {
-              // 后续的分页查询
-              this.tripList = [...this.tripList, ...list];
+      hide: () => {
+        this.upperMsg = '';
+      }
+    }
+    methods = {
+      // bindGetUserInfo: function(e) {
+      //   if (e.source.data.userInfo) {
+      //     console.log('用户已经授权！')
+      //   } else {
+      //     console.log('用户按了拒绝按钮')
+      //   }
+      // },
+      // getUserInfo: function() {
+      //   this.$parent.getUserInfo(function(data) {
+      //     console.log(data)
+      //   })
+      // },
+      // 加载更多行程信息
+      loadMoreTrip() {
+        if (this.selfData.pending === false && this.selfData.done === false) {
+          this.selfData.pending = true;
+          this.selfData.pageNo++;
+          this.requestTripList(
+            this.selfData.keyword,
+            this.selfData.pageNo,
+            this.selfData.pageSize,
+            () => {
+              this.selfData.pending = false;
             }
-            if (pageNo * pageSize >= this.selfData.count) {
-              this.selfData.done = true;
-              this.upperControl.show("--- 这是我的底线了 ---");
-            } else {
-              this.selfData.done = false;
-            }
-          }
-          this.$apply();
-        } else {
-          /* 查询记录失败 */
-          if (pageNo === 1) {
-            this.upperControl.show("这里好像有bug");
-          } else {
-            this.upperControl.show("加载失败");
-          }
-          this.$apply();
+          );
         }
       },
-      fail: msg => {
-        wx.showToast({
-          title: "失败",
-          icon: "none"
-        });
-        if (pageNo === 1) {
-          this.upperControl.show("这里好像有bug");
-        } else {
-          this.upperControl.show("加载失败");
-        }
+      // 搜索
+      search(event) {
+        this.sugData = [];
         this.$apply();
+        if (this.selfData.pending === false) {
+          this.selfData.pending = true;
+          this.selfData.keyword = event.detail.value
+            .replace(/^\s+/, "")
+            .replace(/\s+$/, "");
+          this.selfData.pageNo = 1;
+          this.requestTripList(
+            this.selfData.keyword,
+            this.selfData.pageNo,
+            this.selfData.pageSize,
+            () => {
+              this.selfData.pending = false;
+            }
+          );
+        }
       },
-      complete: () => {
-        callback && callback();
-        console.log("请求完成");
+      bindKeyInput: function(e) {
+        // 发起suggestion检索请求
+        this.selfData.BMap.suggestion({
+          query: e.detail.value,
+          region: '北京',
+          city_limit: true,
+          fail: (data) => {
+            console.log(data);
+          },
+          success: (data) => {
+            this.sugData = data.result;
+          }
+        });
+      },
+      handleSearch: function(e) {
+        console.log(e.target.dataset.name);
+        this.sugData = [];
+        var search_keyword = e.target.dataset.name;
+        this.searchValue = search_keyword;
+        this.$apply();
+        this.requestTripList(search_keyword, 1, 10, function() {});
       }
-    })
+    }
+    // 请求行程数据
+    requestTripList(keyword = '', pageNo = 1, pageSize = 10, callback){
+      HttpService.Post({
+            urlName: 'queryTripListByWord',
+            data: {
+                keyword,
+                pageNo,
+                pageSize
+            },
+            success: (code, data, msg) => {
+              /* 查询记录成功 */
+              if(code === 20000){
+                const { count, list } = data;
+                this.selfData.count = count;
+                if(count === 0){
+                  // 暂无数据
+                  this.tripList = [];
+                  this.upperControl.show(`没有搜索到"${keyword}"相关的行程`);
+                }else{
+                  if(pageNo === 1){
+                    // 新查询
+                    this.tripList = list.map((trip)=>{
+                      trip.trip_end_location = JSON.parse(trip.trip_end_location);
+                      return trip;
+                    });
+                    this.upperControl.show('加载中...');
+                  }else{
+                    // 后续的分页查询
+                    this.tripList = [...this.tripList, ...list.map((trip)=>{
+                      trip.trip_end_location = JSON.parse(trip.trip_end_location);
+                      return trip;
+                    })];
+                  }
+                  if(pageNo * pageSize >= this.selfData.count){
+                    this.selfData.done = true;
+                    this.upperControl.show('--- 这是我的底线了 ---');
+                  }else{
+                    this.selfData.done = false;
+                  }
+                }
+                this.$apply();
+              }else{
+              /* 查询记录失败 */
+                if(pageNo === 1){
+                  this.upperControl.show('这里好像有bug');
+                }else{
+                  this.upperControl.show('加载失败');
+                }
+                this.$apply();
+              }
+            },
+            fail: (msg) => {
+              if(pageNo === 1){
+                this.upperControl.show('这里好像有bug');
+              }else{
+                this.upperControl.show('加载失败');
+              }
+              this.$apply();
+            },
+            complete: () => {
+              callback && callback();
+              console.log('请求完成');
+            }
+      });
+    }
+    // 初始化查询
+    initQuery(){
+      this.selfData.keyword = '';
+      this.selfData.pageNo = 1;
+      this.keyword = '';
+      const { keyword, pageNo, pageSize } = this.selfData;
+      this.selfData.pending = true;
+      wx.showLoading({
+        title: '正在加载',
+        mask: true
+      });
+      this.requestTripList(
+        keyword, 
+        pageNo, 
+        pageSize, 
+        () => {
+          this.selfData.pending = false;
+          wx.hideLoading();
+        }
+      );
+    }
+    onLoad () {
+      // 表示是否从发布页面返回到当前页面
+      wx.setStorageSync('publishToFresh', 0);
+      // 初始化视图高度
+      this.viewHeight = wx.getSystemInfoSync().windowHeight;
+      // 初始化数据请求
+      this.initQuery();
+    }
+    onShow () {
+      const backAndToFresh = wx.getStorageSync('publishToFresh');
+      if(backAndToFresh === 1){
+        wx.setStorageSync('publishToFresh', 0);
+        this.initQuery();
+      }
+    }
   }
-  onLoad() {
-    // 初始化视图高度
-    this.viewHeight = wx.getSystemInfoSync().windowHeight;
-
-    // 初始化数据请求
-    const { keyword, pageNo, pageSize } = this.selfData;
-    this.requestTripList(keyword, pageNo, pageSize, () => {
-      this.selfData.pending = false;
-    });
-
-    // this.$parent.getUserInfo((data) => {
-    //   this.userInfo = data
-    //   this.$apply()
-    // });
-  }
-}
 </script>

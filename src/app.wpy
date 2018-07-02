@@ -22,8 +22,11 @@ import HttpService from './util'
 export default class extends wepy.app {
   config = {
     pages: [
-        // 'pages/trip', // 行程详情
+        // 'pages/user', // 个人主页
+        // 'pages/publish', // 发布
         'pages/index', // 首页
+        // 'pages/publish', // 发布
+        // 'pages/index', // 首页
         'pages/publish', // 发布
         'pages/trip', // 行程详情
         'pages/message', // 消息
@@ -72,6 +75,9 @@ export default class extends wepy.app {
           selectedIconPath: 'images/tabBar/my_press_x48.png'
         }
       ]
+    },
+    networkTimeout: {
+      request: 10000
     }
   }
 

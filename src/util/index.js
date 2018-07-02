@@ -17,7 +17,10 @@ const HttpService = {
     // 接口map
     Apis: {
         queryTripListByWord: 'queryTripListByWord', // 查询行程列表
-        publishTrip: 'publishTrip' //  发布行程
+        publishTrip: 'publishTrip', //  发布行程(新行程/修改行程)
+        saveAsDraft: 'saveAsDraft', // 保存为草稿
+        publishDraftToTrip: '', // 发布草稿为行程
+        queryTripDetail: 'queryTripDetail' // 查询行程信息
     },
     _getUrl (name) {
         return host + (HttpService.Apis[name] || name);
@@ -94,6 +97,21 @@ const HttpService = {
         }
     },
     _fail (fail, err) {
+        if(err.errMsg.indexOf('timeout') !== -1){
+            wx.showToast({
+              title: '请求超时',
+              duration: 1500,
+              mask: true,
+              icon: 'none'
+            });
+          }else{
+            wx.showToast({
+              title: '请求失败',
+              duration: 1500,
+              mask: true,
+              icon: 'none'
+            });
+          }
         fail && fail();
         console.log('request fail:', err);
     },
