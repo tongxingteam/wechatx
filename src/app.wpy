@@ -79,7 +79,8 @@ export default class extends wepy.app {
     // userInfo: null
     userInfo: {
       uid: 'a019406067d511e89c437132ae595195'
-    }
+    },
+    localToken: null
   }
 
   constructor() {
@@ -135,6 +136,9 @@ export default class extends wepy.app {
         }
       }
     })
+  }
+  onLoad() {
+    this.getUserInfo();
   }
 }
 </script>

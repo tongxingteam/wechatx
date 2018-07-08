@@ -193,6 +193,7 @@
 <script>
 import wepy from "wepy";
 import HttpService from "../util";
+import Api from "../api";
 
 export default class Trip extends wepy.page {
   config = {
@@ -204,23 +205,26 @@ export default class Trip extends wepy.page {
       publish_user_wx_name: "里斯本",
       publish_user_wx_portriat: "../images/icon_intro.png",
       trip_create_time: "2018-02-03",
-      trip_start_location: "北京",//出发地
-      trip_end_location: ['西安','上海'],
-      trip_start_time: '2018-03-23',
-      trip_end_time: '2018-03-25',
-      trip_member_count: '5',
-      trip_member_info: [{user_id: '111',user_wx_portriat: '../images/icon_intro.png'},{user_id: '111',user_wx_portriat: '../images/icon_intro.png'}],
-      trip_other_desc: '行程要求',
-      trip_status: '行程状态',
-      trip_id: '行程id号',
-      apply_status_to_add: '当前用户对于此行程的状态'
+      trip_start_location: "北京", //出发地
+      trip_end_location: ["西安", "上海"],
+      trip_start_time: "2018-03-23",
+      trip_end_time: "2018-03-25",
+      trip_member_count: "5",
+      trip_member_info: [
+        { user_id: "111", user_wx_portriat: "../images/icon_intro.png" },
+        { user_id: "111", user_wx_portriat: "../images/icon_intro.png" }
+      ],
+      trip_other_desc: "行程要求",
+      trip_status: "行程状态",
+      trip_id: "行程id号",
+      apply_status_to_add: "当前用户对于此行程的状态"
     },
     place_icon: "../images/place_icon.png",
     is_publish_user: false
   };
   methods = {
-    applyForGroup(){
-      console.log('申请参团！')
+    applyForGroup() {
+      console.log("申请参团！");
     }
   };
   // 上滑显示提示
@@ -232,7 +236,7 @@ export default class Trip extends wepy.page {
       this.upperMsg = "";
     }
   };
-  requestTripDetail(query,callback) {
+  requestTripDetail(query, callback) {
     HttpService.Post({
       urlName: "queryTripDetail",
       data: query,
@@ -243,7 +247,7 @@ export default class Trip extends wepy.page {
           console.log(data);
           // const { count, list } = data;
           var trip_member_info = data.trip_member_info;
-          var trip_end_location = data.trip_end_location
+          var trip_end_location = data.trip_end_location;
           this.travel_data = data;
           this.travel_data.trip_member_info = JSON.parse(trip_member_info);
           this.travel_data.trip_end_location = JSON.parse(trip_end_location);
@@ -267,12 +271,65 @@ export default class Trip extends wepy.page {
       }
     });
   }
+  handleLogin() {
+    const that = this;
+    // 登录
+    wx.login({
+      success: res => {
+        // 发送 res.code 到后台换取 openId, sessionKey, unionId
+        wx.request({
+          url: `${Api.base_url}${Api.login}`,
+          method: "POST",
+          data: {
+            code: res.code
+          },
+          success: function(ress) {
+            const data = ress.data;
+            if (data.code != 1000) {
+              wx.removeStorageSync("token");
+
+              wx.showModal({
+                title: "",
+                content: "登录后可查看更多项目信息",
+                confirmText: "手机登录",
+                confirmColor: "#fcdb00",
+                success: function(res) {
+                  if (res.confirm) {
+                    wx.navigateTo({
+                      url: "/pages/login/login"
+                    });
+                  }
+                }
+              });
+            } else {
+              wx.removeStorageSync("token");
+              app.globalData.userInfo = data.data.user;
+              app.globalData.project_collect = data.data.project_collect;
+              app.globalData.token = data.data.user.token;
+              wx.setStorageSync("session3rd", data.data.session3rd);
+              wx.setStorageSync("token", data.data.user.token);
+
+              that.setData({
+                isLogin: true,
+                isPay: app.globalData.userInfo.profile.is_pay
+              });
+            }
+          }
+        });
+      }
+    });
+  }
   onLoad(option) {
-    console.log("ddddd",option)
-    this.requestTripDetail({
+    console.log(this.$parent.globalData);
+    console.log("ddddd", option);
+    if (!!this.$parent.globalData.localToken) {
+      this.requestTripDetail({
         trip_id: option.tripId,
-        user_id: 'a019406067d511e89c437132ae595195'
-      })
+        user_id: "a019406067d511e89c437132ae595195"
+      });
+    }else {
+      this.handleLogin();
+    }
   }
 }
 </script>

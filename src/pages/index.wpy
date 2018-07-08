@@ -329,6 +329,7 @@ export default class Index extends wepy.page {
       }
     })
   }
+  
   onLoad() {
     // 初始化视图高度
     this.viewHeight = wx.getSystemInfoSync().windowHeight;
