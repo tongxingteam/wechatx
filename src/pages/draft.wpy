@@ -87,79 +87,78 @@ page {
 }
 </style>
 <template>
-  <view>
-    <view class="line-top"></view>
-    <view class="draft">
-      <view class="item-left">
-        <image src="" mode="scaleToFill" />
-      </view>
-      <view class="item-right">
-        <view class="tight-top">
-          <text class="right-top-title">用户昵称</text>
-          <text class="right-top-time">2018-2-2</text>
+    <view>
+        <view class="line-top"></view>
+        <view class="draft">
+            <view class="item-left">
+                <image src="" mode="scaleToFill" />
+            </view>
+            <view class="item-right">
+                <view class="tight-top">
+                    <text class="right-top-title">用户昵称</text>
+                    <text class="right-top-time">2018-2-2</text>
+                </view>
+                <view class="tight-center">
+                    <text class="right-center-title">目的地：</text>
+                    <text class="right-center-address">故宫</text>
+                    <text class="right-center-address">颐和园</text>
+                </view>
+                <view class="tight-bottom">
+                    <text class="right-bottom-time">时间:2011-1-1~20112-2-2</text>
+                    <navigator url="/pages/draft_item">
+                        <text class="right-bottom-nav">查看详情</text>
+                    </navigator>
+                </view>
+            </view>
         </view>
-        <view class="tight-center">
-          <text class="right-center-title">目的地：</text>
-          <text class="right-center-address">故宫</text>
-          <text class="right-center-address">颐和园</text>
+
+        <view class="draft">
+            <view class="item-left">
+                <image src="" mode="scaleToFill" />
+            </view>
+            <view class="item-right">
+                <view class="tight-top">
+                    <text class="right-top-title">用户昵称</text>
+                    <text class="right-top-time">2018-2-2</text>
+                </view>
+                <view class="tight-center">
+                    <text class="right-center-title">目的地：</text>
+                    <text class="right-center-address">故宫</text>
+                    <text class="right-center-address">颐和园</text>
+                </view>
+                <view class="tight-bottom">
+                    <text class="right-bottom-time">时间:2011-1-1~20112-2-2</text>
+                    <navigator url="/pages/draft_item">
+                        <text class="right-bottom-nav">查看详情</text>
+                    </navigator>
+                </view>
+            </view>
         </view>
-        <view class="tight-bottom">
-          <text class="right-bottom-time">时间:2011-1-1~20112-2-2</text>
-          <navigator url="/pages/draft_item">
-            <text class="right-bottom-nav">查看详情</text>
-          </navigator>
+
+        <view class="draft">
+            <view class="item-left">
+                <image src="" mode="scaleToFill" />
+            </view>
+            <view class="item-right">
+                <view class="tight-top">
+                    <text class="right-top-title">用户昵称</text>
+                    <text class="right-top-time">2018-2-2</text>
+                </view>
+                <view class="tight-center">
+                    <text class="right-center-title">目的地：</text>
+                    <text class="right-center-address">故宫</text>
+                    <text class="right-center-address">颐和园</text>
+                </view>
+                <view class="tight-bottom">
+                    <text class="right-bottom-time">时间:2011-1-1~20112-2-2</text>
+                    <navigator url="/pages/draft_item">
+                        <text class="right-bottom-nav">查看详情</text>
+                    </navigator>
+                </view>
+            </view>
         </view>
-      </view>
+
     </view>
-
-    <view class="draft">
-      <view class="item-left">
-        <image src="" mode="scaleToFill" />
-      </view>
-      <view class="item-right">
-        <view class="tight-top">
-          <text class="right-top-title">用户昵称</text>
-          <text class="right-top-time">2018-2-2</text>
-        </view>
-        <view class="tight-center">
-          <text class="right-center-title">目的地：</text>
-          <text class="right-center-address">故宫</text>
-          <text class="right-center-address">颐和园</text>
-        </view>
-        <view class="tight-bottom">
-          <text class="right-bottom-time">时间:2011-1-1~20112-2-2</text>
-          <navigator url="/pages/draft_item">
-            <text class="right-bottom-nav">查看详情</text>
-          </navigator>
-        </view>
-      </view>
-    </view>
-
-
-    <view class="draft">
-      <view class="item-left">
-        <image src="" mode="scaleToFill" />
-      </view>
-      <view class="item-right">
-        <view class="tight-top">
-          <text class="right-top-title">用户昵称</text>
-          <text class="right-top-time">2018-2-2</text>
-        </view>
-        <view class="tight-center">
-          <text class="right-center-title">目的地：</text>
-          <text class="right-center-address">故宫</text>
-          <text class="right-center-address">颐和园</text>
-        </view>
-        <view class="tight-bottom">
-          <text class="right-bottom-time">时间:2011-1-1~20112-2-2</text>
-          <navigator url="/pages/draft_item">
-            <text class="right-bottom-nav">查看详情</text>
-          </navigator>
-        </view>
-      </view>
-    </view>
-
-  </view>
 
 </template>
 <script>
@@ -186,55 +185,22 @@ export default class Draft extends wepy.page {
         tripList: [] // 行程列表数据
     };
     onLoad() {
-        // 初始化数据请求
-        const { keyword, pageNo, pageSize } = this.selfData;
-        this.requestTripList(keyword, pageNo, pageSize, () => {
-            this.selfData.pending = false;
-        });
-    }
-    methods = {};
-    //请求行程数据
-    requestTripList(keyword = "", pageNo = 1, pageSize = 10, callback) {
-        HttpService.Post({
-            urlName: "queryTripListByWord",
+        wx.request({
+            url: "https://wxtx.ilvdudu.com/v1/queryMyDraftList",
             data: {
-                keyword,
-                pageNo,
-                pageSize
+              "user_id": "a019406067d511e89c437132ae595195",
+              "currentPage": 1,
+              "pageSize": 10
             },
-            success: (code, data, msg) => {
-                /* 查询记录成功 */
-                if (code === 20000) {
-                    console.log(data);
-                    const { count, list } = data;
-                    this.selfData.count = count;
-                    if (count === 0) {
-                        // 暂无数据
-                        this.upperControl.show(
-                            `没有搜索到"${keyword}"相关的行程`
-                        );
-                    } else {
-                        if (pageNo === 1) {
-                            // 新查询
-                            this.tripList = list;
-                            //this.upperControl.show('加载中...');
-                        } else {
-                            // 后续的分页查询
-                            this.tripList = [...this.tripList, ...list];
-                        }
-                    }
-                    this.$apply();
-                }
+            header: {
+                "content-type": "application/json" // 默认值
             },
-            fail: msg => {
-                console.log(msg);
-            },
-            complete: () => {
-                callback && callback();
-                console.log("请求完成");
+            success: function(res) {
+                console.log(res);
             }
         });
     }
+    methods = {};
 }
 </script>
 

@@ -194,7 +194,22 @@ export default class Publish extends wepy.page {
         disabled: false,
         loading: false
     };
-    onLoad() {}
+    onLoad() {
+        wx.request({
+            url: "https://wxtx.ilvdudu.com/v1/queryMyDraftList",
+            data: {
+              "user_id": "a019406067d511e89c437132ae595195",
+              "currentPage": 1,
+              "pageSize": 10
+            },
+            header: {
+                "content-type": "application/json" // 默认值
+            },
+            success: function(res) {
+                console.log(res);
+            }
+        });
+    };
     methods = {
         //出发地
         bindDepartureRegionChange: function(e) {

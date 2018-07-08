@@ -273,14 +273,14 @@ import Api from "../api";
                   if(pageNo === 1){
                     // 新查询
                     this.tripList = list.map((trip)=>{
-                      trip.trip_end_location = JSON.parse(trip.trip_end_location);
+                      trip.trip_end_location = JSON.parse(trip.trip_end_location)[0];
                       return trip;
                     });
                     this.upperControl.show('加载中...');
                   }else{
                     // 后续的分页查询
                     this.tripList = [...this.tripList, ...list.map((trip)=>{
-                      trip.trip_end_location = JSON.parse(trip.trip_end_location);
+                      trip.trip_end_location = JSON.parse(trip.trip_end_location)[0];
                       return trip;
                     })];
                   }
