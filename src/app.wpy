@@ -18,12 +18,16 @@ view{
 import wepy from 'wepy'
 import 'wepy-async-function'
 import HttpService from './util'
+import Api from "./api";
 
 export default class extends wepy.app {
   config = {
     pages: [
-        // 'pages/trip', // 行程详情
+        // 'pages/user', // 个人主页
+        // 'pages/publish', // 发布
         'pages/index', // 首页
+        // 'pages/publish', // 发布
+        // 'pages/index', // 首页
         'pages/publish', // 发布
         'pages/trip', // 行程详情
         'pages/message', // 消息
@@ -35,7 +39,8 @@ export default class extends wepy.app {
         'pages/mySponsor',//我的发起
         'pages/myTx',//我的同行
         'pages/draft',//我的草稿列表页
-        'pages/draft_item'//我的草稿详情页
+        'pages/draft_item',//我的草稿详情页
+        'pages/login'
     ],
     window: {
       backgroundTextStyle: 'light',
@@ -72,15 +77,19 @@ export default class extends wepy.app {
           selectedIconPath: 'images/tabBar/my_press_x48.png'
         }
       ]
+    },
+    networkTimeout: {
+      request: 10000
     }
   }
 
   globalData = {
-    // userInfo: null
-    userInfo: {
-      uid: 'a019406067d511e89c437132ae595195'
-    },
-    localToken: null
+    userInfo: null,
+    // userInfo: {
+    //   uid: 'a019406067d511e89c437132ae595195'
+    // },
+    localToken: null,
+    isLogin: false,
   }
 
   constructor() {
@@ -88,9 +97,7 @@ export default class extends wepy.app {
     this.use('requestfix')
   }
 
-  onLaunch() {
-    //this.testAsync()
-  }
+  
 
   sleep(s) {
     return new Promise((resolve, reject) => {
@@ -118,12 +125,14 @@ export default class extends wepy.app {
   }
 
   getUserInfo(cb) {
+    console.log(cb);
     const that = this
-    if (this.globalData.userInfo) {
+    if (this.globalData.userInfo != null) {
       return this.globalData.userInfo
     }
     wepy.getSetting({
       success: function(res) {
+        console.log(res,res.authSetting['scope.userInfo'])
         if (res.authSetting['scope.userInfo']) {
           wepy.getUserInfo({
             success: function(res) {
@@ -131,14 +140,75 @@ export default class extends wepy.app {
               that.globalData.userInfo = res.userInfo
               console.log('globalData', that.globalData)
               cb && cb(res.userInfo)
+            },
+            error: function(err) {
+              console.log(err);
             }
           })
+        }else{
+          wx.navigateTo({
+            url: 'login'
+          });
         }
       }
     })
   }
+  handleLogin(user) {
+    let that = this;
+    console.log(user,this);
+    // 登录
+    wx.login({
+      success: res => {
+        // 发送 res.code 到后台换取 openId, sessionKey, unionId
+        console.log("res",res)
+        wx.request({
+          url: `${Api.base_url}${Api.login}`,
+          method: "POST",
+          data: {
+            code: res.code
+          },
+          success: (ress) => {
+            console.log(ress);
+            const data = ress.data;
+            if (data.code != 20000) {
+              wx.removeStorageSync("localToken");
+
+              wx.showModal({
+                title: "",
+                content: "登录后可查看更多项目信息",
+                confirmText: "手机登录",
+                confirmColor: "#fcdb00",
+                success: function(res) {
+                  if (res.confirm) {
+                    wx.navigateTo({
+                      url: "login"
+                    });
+                  }
+                }
+              });
+            } else {
+              wx.removeStorageSync("localToken");
+              console.log("===>",this);
+              // this.$parent.globalData.userInfo = data.data.user;
+              // this.$parent.globalData.project_collect = data.data.project_collect;
+              this.globalData.localToken = data.data.token;
+              // wx.setStorageSync("session3rd", data.data.session3rd);
+              wx.setStorageSync("localToken", data.data.token);
+              this.globalData.isLogin = true;
+              // this.$apply();
+            }
+          }
+        });
+      }
+    });
+  }
   onLoad() {
-    this.getUserInfo();
+    // console.log("-----")
+    // this.getUserInfo(this.handleLogin);
+  }
+  onLaunch() {
+     console.log("-----")
+    // this.getUserInfo(this.handleLogin.bind(this));
   }
 }
 </script>

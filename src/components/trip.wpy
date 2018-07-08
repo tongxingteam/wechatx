@@ -6,7 +6,7 @@
         width: 100%;
         padding: 18rpx 30rpx;
         background-color: #fff;
-        margin-bottom: 5rpx;
+        border-bottom: 1px solid #eee;
         .trip_header{
             display: flex;
             justify-content: space-between;

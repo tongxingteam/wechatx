@@ -141,6 +141,11 @@ export default class Index extends wepy.page {
         /* 查询记录成功 */
         if (code === 20000) {
           const { count, list } = data;
+          for (let i = 0, len = list.length; i < len; i++) {
+            list[i]["trip_end_location"] = JSON.parse(
+              JSON.parse(list[i]["trip_end_location"])
+            );
+          }
           this.selfData.count = count;
           if (count === 0) {
             // 暂无数据

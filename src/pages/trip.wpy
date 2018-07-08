@@ -180,13 +180,18 @@
               <image src='../images/ellipsis_icon.png'/>
             </view>
         </view>
-        <view wx:if="{{is_publish_user}}" class="inline-box" style="border:0;padding: 10rpx 10rpx;">
-            <button class="pub-btn" @tap.stop="applyForGroup" data-id="{{travel_data.trip_id}}">申请参团</button>
-        </view>
-        <view wx:else class="inline-box" style="border:0;padding: 10rpx 10rpx;">
-          <navigator url="/pages/apply_list?id='{{travel_data.trip_id}}'">
+        <view wx:if="{{travel_data.self_trip}}" class="inline-box" style="border:0;padding: 10rpx 10rpx;">
+          <navigator url="/pages/apply_list?id={{travel_data.trip_id}}">
             <button class="pub-btn">查看申请列表</button>
           </navigator>
+        </view>
+        <view wx:else class="inline-box" style="border:0;padding: 10rpx 10rpx;">
+
+          <button wx:if="{{travel_data.apply_status_to_add == 0}}" class="pub-btn" data-id="{{travel_data.trip_id}}">已申请</button>
+          <button wx:elif="{{travel_data.apply_status_to_add == 1}}" class="pub-btn" data-id="{{travel_data.trip_id}}">已同意</button>
+          <button wx:elif="{{travel_data.apply_status_to_add == 2}}" class="pub-btn" data-id="{{travel_data.trip_id}}">已被拒绝</button>
+          <button wx:elif="{{travel_data.apply_status_to_add == 3}}" class="pub-btn" @tap.stop="outForGroup" data-id="{{travel_data.trip_id}}">退出</button>
+          <button wx:else class="pub-btn" @tap.stop="applyForGroup" data-id="{{travel_data.trip_id}}">申请参团</button>
         </view>
     </view>
 </template>
@@ -200,6 +205,7 @@ export default class Trip extends wepy.page {
     navigationBarTitleText: "约伴详情"
   };
   data = {
+    trip_id: '',
     travel_data: {
       publish_user_id: "123",
       publish_user_wx_name: "里斯本",
@@ -217,7 +223,8 @@ export default class Trip extends wepy.page {
       trip_other_desc: "行程要求",
       trip_status: "行程状态",
       trip_id: "行程id号",
-      apply_status_to_add: "当前用户对于此行程的状态"
+      apply_status_to_add: 99,//0申请中 1同意 2拒绝 3退出
+      self_trip: true
     },
     place_icon: "../images/place_icon.png",
     is_publish_user: false
@@ -225,6 +232,38 @@ export default class Trip extends wepy.page {
   methods = {
     applyForGroup() {
       console.log("申请参团！");
+      HttpService.Post({
+      urlName: "requestJoin",
+      data: {
+        trip_id: this.travel_data.trip_id,
+        publisher_id: this.travel_data.publish_user_id
+      },
+      success: (code, data, msg) => {
+        console.log(code, data, msg);
+        /* 查询记录成功 */
+        if (code === 20000) {
+          console.log(data);
+          // const { count, list } = data;
+         
+          this.$apply();
+        } else {
+          this.upperControl.show("加载失败");
+          this.$apply();
+        }
+      },
+      fail: msg => {
+        wx.showToast({
+          title: msg,
+          icon: "none"
+        });
+        this.upperControl.show("加载失败");
+        this.$apply();
+      },
+      complete: () => {
+        // callback && callback();
+        console.log("请求完成");
+      }
+    });
     }
   };
   // 上滑显示提示
@@ -241,7 +280,7 @@ export default class Trip extends wepy.page {
       urlName: "queryTripDetail",
       data: query,
       success: (code, data, msg) => {
-        console.log(code);
+        console.log(code, data, msg);
         /* 查询记录成功 */
         if (code === 20000) {
           console.log(data);
@@ -249,6 +288,7 @@ export default class Trip extends wepy.page {
           var trip_member_info = data.trip_member_info;
           var trip_end_location = data.trip_end_location;
           this.travel_data = data;
+          console.log(trip_member_info, trip_end_location)
           this.travel_data.trip_member_info = JSON.parse(trip_member_info);
           this.travel_data.trip_end_location = JSON.parse(trip_end_location);
           this.$apply();
@@ -284,8 +324,9 @@ export default class Trip extends wepy.page {
             code: res.code
           },
           success: function(ress) {
+            // console.log(ress);
             const data = ress.data;
-            if (data.code != 1000) {
+            if (data.code != 20000) {
               wx.removeStorageSync("token");
 
               wx.showModal({
@@ -296,23 +337,20 @@ export default class Trip extends wepy.page {
                 success: function(res) {
                   if (res.confirm) {
                     wx.navigateTo({
-                      url: "/pages/login/login"
+                      url: "login"
                     });
                   }
                 }
               });
             } else {
               wx.removeStorageSync("token");
-              app.globalData.userInfo = data.data.user;
-              app.globalData.project_collect = data.data.project_collect;
-              app.globalData.token = data.data.user.token;
-              wx.setStorageSync("session3rd", data.data.session3rd);
-              wx.setStorageSync("token", data.data.user.token);
-
-              that.setData({
-                isLogin: true,
-                isPay: app.globalData.userInfo.profile.is_pay
-              });
+              // this.$parent.globalData.userInfo = data.data.user;
+              // this.$parent.globalData.project_collect = data.data.project_collect;
+              that.$parent.globalData.token = data.data.token;
+              // wx.setStorageSync("session3rd", data.data.session3rd);
+              wx.setStorageSync("token", data.data.token);
+              that.$parent.globalData.isLogin = true;
+              that.$apply();
             }
           }
         });
@@ -320,16 +358,14 @@ export default class Trip extends wepy.page {
     });
   }
   onLoad(option) {
-    console.log(this.$parent.globalData);
-    console.log("ddddd", option);
-    if (!!this.$parent.globalData.localToken) {
-      this.requestTripDetail({
-        trip_id: option.tripId,
-        user_id: "a019406067d511e89c437132ae595195"
+    // console.log(this.$parent.globalData);
+    // console.log("ddddd", option);
+    this.requestTripDetail({
+        trip_id: option.tripId
+        // user_id: "a019406067d511e89c437132ae595195"
       });
-    }else {
-      this.handleLogin();
-    }
+    this.trip_id = option.tripId;
+    // this.$apply();
   }
 }
 </script>

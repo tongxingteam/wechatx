@@ -71,37 +71,88 @@
     </view>
 </template>
 <script>
-    import wepy from 'wepy';
+import wepy from "wepy";
+import HttpService from "../util";
+import Api from "../api";
 
-    export default class Login extends wepy.page {
-        config = {
-            navigationBarTitleText: '登录'
-        }
-        data = {
-            canIUse:wx.canIUse('button.open-type.getUserInfo')
-        }
-        methods = {        
-            bindGetUserInfo: function(e) {
-                console.log(e.detail.userInfo)
-            }
-        }
-          onLoad() {
-                    // 查看是否授权
-                    wx.getSetting({
-                    success: function(res){
-                        if (res.authSetting['scope.userInfo']) {
-                        // 已经授权，可以直接调用 getUserInfo 获取头像昵称
-                        
-                        
-                        wx.getUserInfo({
-                            success: function(res) {
-                            console(res.userInfo)
-                            }
-                        })
-                        }
+export default class Login extends wepy.page {
+  config = {
+    navigationBarTitleText: "登录"
+  };
+  data = {
+    canIUse: wx.canIUse("button.open-type.getUserInfo")
+  };
+  methods = {
+    bindGetUserInfo: function(e) {
+      console.log(e.detail.userInfo);
+      this.$parent.globalData.userInfo = e.detail.userInfo;
+      // 登录
+      wx.login({
+        success: res => {
+          // 发送 res.code 到后台换取 openId, sessionKey, unionId
+          console.log("res", res);
+          wx.request({
+            url: `${Api.base_url}${Api.login}`,
+            method: "POST",
+            data: {
+              code: res.code,
+              userInfo: this.$parent.globalData.userInfo
+            },
+            success: ress => {
+              console.log(ress);
+              const data = ress.data;
+              if (data.code != 20000) {
+                wx.removeStorageSync("localToken");
+
+                wx.showModal({
+                  title: "",
+                  content: "登录后可查看更多项目信息",
+                  confirmText: "手机登录",
+                  confirmColor: "#fcdb00",
+                  success: function(res) {
+                    if (res.confirm) {
+                      wx.navigateTo({
+                        url: "login"
+                      });
                     }
-                    })
-                }
+                  }
+                });
+              } else {
+                console.log("121-login...");
+                wx.removeStorageSync("localToken");
+                this.$parent.globalData.localToken = data.data.token;
+                // wx.setStorageSync("session3rd", data.data.session3rd);
+                wx.setStorageSync("localToken", data.data.token);
+                this.$parent.globalData.isLogin = true;
+                console.log("login...");
+                // this.$apply();
+                wx.navigateBack();
+              }
+            }
+          });
+        }
+      });
     }
+  };
+  onLoad() {
+    // 查看是否授权
+    wx.getSetting({
+      success: function(res) {
+        if (res.authSetting["scope.userInfo"]) {
+          // 已经授权，可以直接调用 getUserInfo 获取头像昵称
+
+          wx.getUserInfo({
+            success: function(res) {
+              console(res.userInfo);
+            }
+          });
+        }
+      }
+    });
+  }
+  onUnload() {
+    wx.setStorageSync("publishToFresh", 1);
+  }
+}
 </script>
 

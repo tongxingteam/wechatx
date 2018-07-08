@@ -131,11 +131,20 @@ export default class My extends wepy.page {
       console.log("处理拒绝申请！");
     }
   };
-  getTripApplyList(callback) {
+  // 上滑显示提示
+  upperControl = {
+    show: msg => {
+      this.upperMsg = msg;
+    },
+    hide: () => {
+      this.upperMsg = "";
+    }
+  };
+  getTripApplyList(tripId,callback) {
     HttpService.Post({
       urlName: "queryTripApplyList",
       data: {
-        trip_id: "5cbe08506b0011e8a53a53d3bea89acf"
+        trip_id: tripId
         // user_id: "b019406067d511e89c437132ae595195",
       },
       success: (code, data, msg) => {
@@ -165,8 +174,10 @@ export default class My extends wepy.page {
       }
     });
   }
-  onLoad() {
-    this.getTripApplyList();
+  onLoad(option) {
+    let trip_id = option.id;
+    console.log(option.id)
+    this.getTripApplyList(trip_id);
   }
 }
 </script>

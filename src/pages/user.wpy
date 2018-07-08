@@ -37,7 +37,7 @@
   }
   .trip-list {
     box-sizing: border-box;
-    background-color: #ddd;
+    background-color: #eee;
     width: 100%;
   }
   .banner {
@@ -95,7 +95,7 @@
 <template>
   <view>
     <view class="banner">
-      <image src="{{imgUrls}}" class="slide-image" width='750rpx' height="195" mode="scaleToFill" />
+      <image src="{{imgUrls}}" class="slide-image" width='750rpx' height="195rpx" mode="scaleToFill" />
     </view>
     <view class="navbar page">
       <view class="page__bd">
@@ -190,6 +190,8 @@
     }
     // 请求行程数据
     requestTripList(keyword = '', pageNo = 1, pageSize = 10, callback) {
+      this.tripList = [{},{},{},{},{},{},{},{},{},{}];
+      return;
       HttpService.Post({
         urlName: 'queryTripListByWord',
         data: {
@@ -255,8 +257,8 @@
     }
     async onLoad() {
       let res = wx.getSystemInfoSync();
-      wx.createSelectorQuery().select('#sview').boundingClientRect(function(rect) {
-        this.viewHeight = wx.getSystemInfoSync().windowHeight - rect.top;
+      wx.createSelectorQuery().select('.weui-tab__panel').boundingClientRect((rect) => {
+        this.viewHeight = wx.getSystemInfoSync().windowHeight - rect.top - 50;
       }).exec()
       console.log("授权:", res);
       this.sliderLeft = (res.windowWidth / this.tabs.length - sliderWidth) / 2;
