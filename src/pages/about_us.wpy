@@ -61,11 +61,13 @@ page {
                 <text>我的草稿</text>
             </view>
         </navigator>
-
     </view>
 </template>
 <script>
-export default {};
+import wepy from "wepy";
+import HttpService from "../util";
+
+export default class Publish extends wepy.page  {};
 </script>
 
 
