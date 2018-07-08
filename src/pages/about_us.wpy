@@ -67,7 +67,11 @@ page {
 import wepy from "wepy";
 import HttpService from "../util";
 
-export default class Publish extends wepy.page  {};
+export default class Publish extends wepy.page  {
+    config = {
+    navigationBarTitleText: "我的"
+  };
+};
 </script>
 
 
