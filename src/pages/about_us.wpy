@@ -1,0 +1,72 @@
+<style lang="less">
+@rpx: 2rpx;
+page {
+    background-color: #f1f1f1;
+}
+.line-top {
+    width: 100%;
+    height: 2rpx;
+    background-color: #fff;
+}
+.section {
+    width: 100%;
+    //height: 246rpx;
+    background-color: #fff;
+    box-sizing: border-box;
+    padding: 34rpx 20rpx;
+    display: flex;
+    margin-top: 5rpx;
+    font-size: 14px;
+    line-height: 1.5rem;
+}
+.right-icon {
+    position: relative;
+}
+.right-icon::before {
+    content: "";
+    width: 7 * @rpx;
+    height: 7 * @rpx;
+    border-top: 1px solid #101010;
+    border-right: 1px solid #101010;
+    transform: rotate(45deg);
+    position: absolute;
+    top: 52rpx;
+    right: 30rpx;
+}
+</style>
+<template>
+    <view>
+        <view class="line-top"></view>
+        <navigator url="">
+            <view class="section right-icon">
+                <i class="iconfont tx-biaoji icon" style="margin-right: 12rpx;"></i>
+                <text>我的发起</text>
+            </view>
+        </navigator>
+        <navigator>
+            <view class="section right-icon">
+                <i class="iconfont tx-biaoji icon" style="margin-right: 12rpx;"></i>
+                <text>申请记录</text>
+            </view>
+        </navigator>
+        <navigator>
+            <view class="section right-icon">
+                <i class="iconfont tx-biaoji icon" style="margin-right: 12rpx;"></i>
+                <text>我的同行</text>
+            </view>
+        </navigator>
+        <navigator url="/pages/draft">
+            <view class="section right-icon">
+                <i class="iconfont tx-biaoji icon" style="margin-right: 12rpx;"></i>
+                <text>我的草稿</text>
+            </view>
+        </navigator>
+
+    </view>
+</template>
+<script>
+export default {};
+</script>
+
+
+
