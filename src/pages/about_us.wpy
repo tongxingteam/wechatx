@@ -37,19 +37,19 @@ page {
 <template>
     <view>
         <view class="line-top"></view>
-        <navigator url="">
+        <navigator url="/pages/mySponsor">
             <view class="section right-icon">
                 <i class="iconfont tx-biaoji icon" style="margin-right: 12rpx;"></i>
                 <text>我的发起</text>
             </view>
         </navigator>
-        <navigator>
+        <navigator url="/pages/applicationRecord">
             <view class="section right-icon">
                 <i class="iconfont tx-biaoji icon" style="margin-right: 12rpx;"></i>
                 <text>申请记录</text>
             </view>
         </navigator>
-        <navigator>
+        <navigator url="/pages/myTx">
             <view class="section right-icon">
                 <i class="iconfont tx-biaoji icon" style="margin-right: 12rpx;"></i>
                 <text>我的同行</text>
