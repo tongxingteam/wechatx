@@ -244,7 +244,7 @@ export default class Trip extends wepy.page {
           // const { count, list } = data;
           var trip_member_info = data.trip_member_info;
           var trip_end_location = data.trip_end_location;
-          var trip_start_location = data.trip_start_location[0];
+          var trip_start_location = JSON.parse(data.trip_start_location)[0];
           this.travel_data = data;
           this.travel_data.trip_start_location = trip_start_location;
           this.travel_data.trip_member_info = JSON.parse(trip_member_info);
